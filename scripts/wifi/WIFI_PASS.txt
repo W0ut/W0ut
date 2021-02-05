@@ -1,0 +1,1 @@
+ date, essid, bssid, password, pin

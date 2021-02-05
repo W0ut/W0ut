@@ -1,0 +1,420 @@
+# ~/.zshrc file for zsh interactive shells.
+# see /usr/share/doc/zsh/examples/zshrc for examples
+
+# ══ Regular color ════════╗ START ╔═
+    BK=$(tput setaf 232)  # Black
+    GY=$(tput setaf 246)  # Gray
+    RD=$(tput setaf 160)  # Red
+    GR=$(tput setaf 46)   # Green
+    YW=$(tput setaf 226)  # Yellow
+    OR=$(tput setaf 208)  # Orange
+    BL=$(tput setaf 80)   # Blue
+    MG=$(tput setaf 129)  # Magenta
+    PR=$(tput setaf 198)  # Purple
+    CY=$(tput setaf 14)   # Cyan
+    WH=$(tput setaf 15)   # White
+    NM=$(tput sgr0)       # Norm
+    BD=$(tput bold)       # Bold
+    BG=$(tput setab 3)    # Background Color
+# ══ Regular color ════════╝  END  ╚═
+
+# ══ Move cursor ════════╗ START ╔═
+    SVC=$(tput sc)      # save position
+    RSC=$(tput rc)      # restore position
+    NRC=$(tput cnorm)   # back position to norm
+    UPC=$(tput cuu1)    # up position 1 line
+    DWC=$(tput cud1)    # down position 1 line
+    LFC=$(tput cub1)    # left position 1 line
+    RGC=$(tput cuf1)    # right position 1 line
+    CL1=$(tput el)      # clean line <==|
+    CL2=$(tput el1)     # clean line |==>
+# ══ Move cursor ════════╝  END  ╚═
+
+setopt autocd              # change directory just by typing its name
+#setopt correct            # auto correct mistakes
+setopt interactivecomments # allow comments in interactive mode
+setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
+setopt nonomatch           # hide error message if there is no match for the pattern
+setopt notify              # report the status of background jobs immediately
+setopt numericglobsort     # sort filenames numerically when it makes sense
+setopt promptsubst         # enable command substitution in prompt
+
+WORDCHARS=${WORDCHARS//\/} # Don't consider certain characters part of the word
+
+# hide EOL sign ('%')
+PROMPT_EOL_MARK=""
+
+# configure key keybindings
+bindkey -e                                        # emacs key bindings
+bindkey ' ' magic-space                           # do history expansion on space
+bindkey '^[[3;5~' kill-word                       # ctrl + Supr
+bindkey '^[[3~' delete-char                       # delete
+bindkey '^[[1;5C' forward-word                    # ctrl + ->
+bindkey '^[[1;5D' backward-word                   # ctrl + <-
+bindkey '^[[5~' beginning-of-buffer-or-history    # page up
+bindkey '^[[6~' end-of-buffer-or-history          # page down
+bindkey '^[[H' beginning-of-line                  # home
+bindkey '^[[F' end-of-line                        # end
+bindkey '^[[Z' undo                               # shift + tab undo last action
+
+# enable completion features
+autoload -Uz compinit
+compinit -d ~/.cache/zcompdump
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive tab completion
+
+# History configurations
+HISTFILE=~/.zsh_history
+HISTSIZE=1000
+SAVEHIST=2000
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+#setopt share_history         # share command history data
+
+# force zsh to show the complete history
+alias history="history 0"
+
+# make less more friendly for non-text input files, see lesspipe(1)
+#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+    else
+    color_prompt=
+    fi
+fi
+TMP_StPROXY=`ls /tmp/ | grep -E StPROXY`
+if [ "$TMP_StPROXY" == "" ];
+    then
+        echo -en "" > /tmp/StPROXY
+    else
+fi
+StPROXY=$(cat /tmp/StPROXY)
+
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║    Reset all MAC
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function resmac() {
+        ip route show | grep -Eoa "dev.*metric" | awk '{print $2}' | sort -u > /tmp/iface.txt
+        while read MYINTERFACE
+            do
+                ifconfig $MYINTERFACE down 2>/dev/null
+                macchanger -p $MYINTERFACE &>/dev/null
+                ifconfig $MYINTERFACE up 2>/dev/null
+        done < /tmp/iface.txt
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║    Change Hostname
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function chhost() {
+        echo -en " ${SVC}${NM}Enter NEW HOSTNAME ${BD}${CY}> ${RD}"
+        read newhn
+        cp -n /etc/hosts{,.old}
+        idomainname=$(domainname -i)
+        fdomainname=$(domainname -f)
+        if [[ -z "$newhn" ]]; then
+            newhn=$(cat /dev/urandom | tr -dc 'A-Z' | head -c8)
+        fi
+        echo $newhn > /etc/hostname
+        mv /etc/hosts /etc/hosts.old
+        echo "127.0.0.1 localhost" > /etc/hosts
+        echo "$idomainname  $fdomainname    $newhn" >> /etc/hosts
+        echo "# The following lines are desirable for IPv6 capable hosts" >> /etc/hosts
+        echo "::1     localhost ip6-localhost ip6-loopback" >> /etc/hosts
+        echo "ff02::1 ip6-allnodes" >> /etc/hosts
+        echo "ff02::2 ip6-allrouters" >> /etc/hosts
+        service hostname stop &>/dev/null
+        sleep 1
+        service hostname start &>/dev/null
+        service networking stop
+        sleep 1
+        service networking start
+        service network-manager stop
+        sleep 1
+        service network-manager start
+        xhost +$newhn &>/dev/null
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║    Start tor and Privoxy
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function setproxy() {
+        export all_proxy="socks://localhost:9050/"
+        export http_proxy="http://localhost:8118/"
+        export https_proxy="http://localhost:8118/"
+        export ftp_proxy="http://localhost:8118/"
+        export no_proxy="localhost,127.0.0.1,127.0.0.0/8,::1"
+        service tor start && service privoxy start
+        INETIP=$(wget -O - -q icanhazip.com)
+        CITY=$(curl ipinfo.io &> /tmp/ipinftmp && cat /tmp/ipinftmp | grep city | awk -F '"' '{print $4}')
+        echo -en "PROXY" > /tmp/StPROXY
+        StPROXY=$(cat /tmp/StPROXY)
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║    Stop tor and Privoxy
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function unsetproxy() {
+        unset all_proxy
+        unset http_proxy
+        unset https_proxy
+        unset ftp_proxy
+        service tor stop && service privoxy stop
+        INETIP=$(wget -O - -q icanhazip.com)
+        CITY=$(curl ipinfo.io &> /tmp/ipinftmp && cat /tmp/ipinftmp | grep city | awk -F '"' '{print $4}')
+        echo -en "" > /tmp/StPROXY
+        StPROXY=$(cat /tmp/StPROXY)
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+if [ "$StPROXY" == "PROXY" ];
+    then
+        setproxy
+    else
+        unsetproxy
+fi
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║    Get internet ip
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    INETIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+    CITY=$(curl ipinfo.io &> /tmp/ipinftmp && cat /tmp/ipinftmp | grep city | awk -F '"' '{print $4}')
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║    Search all running commands by user
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function my_ps() { ps -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
+
+    function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Start airmon-ng
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function stwl() {
+        INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
+        if [[ -z "$INFACE" ]]
+            then
+                IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+                if [[ -n "$IMANAGED" ]]
+                    then
+                        airmon-ng start $IMANAGED &>/dev/null
+                        INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
+                        if [[ -n "$INFACE" ]]
+                            then
+                                clear
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${NM}${BD}STARTED${NM}${WH} ."
+                                echo ""
+                            else
+                                clear
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                                echo ""
+                        fi
+                            else
+                                clear
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                                echo ""
+                fi
+        fi
+    }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Stop airmon-ng
+#╚═════════════════════════════════════════════════════════════════════════════╝
+function stpwl() {
+    INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
+        if [[ -n "$INFACE" ]]
+            then
+                IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
+                if [[ -n "$IMANAGED" ]]
+                    then
+                        clear
+                        airmon-ng stop $IMANAGED &>/dev/null
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${NM}${BD}STOPED${NM}${WH} ."
+                        echo ""
+                    else
+                        clear
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+}
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║  We hide our presence
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function iclean() {
+        echo > /var/log/auth
+        echo > /var/log/auth.log
+        echo > /var/log/wtmp
+        echo > /var/log/btmp
+        echo > /var/log/lastlog
+        history -r
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+
+if [ "$color_prompt" = yes ]; then
+    PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)──}(%B%F{%(#.red.blue)}%n%(#.💀.㉿)%m%b%F{%(#.blue.green)})-[%F{%(#.green)}ip:%F{%(#.yellow.cyan)}$INETIP%F{%(#.green)}/%F{%(#.yellow.cyan)}$CITY%F{%(#.blue.green)}]-[%b%F{%(#.red)}$StPROXY%F{%(#.blue.green)}]-[%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
+    RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
+
+    # enable syntax-highlighting
+    if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ] && [ "$color_prompt" = yes ]; then
+    . /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+    ZSH_HIGHLIGHT_STYLES[default]=none
+    ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red,bold
+    ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[global-alias]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[path]=underline
+    ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[command-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[process-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[assign]=none
+    ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
+    ZSH_HIGHLIGHT_STYLES[named-fd]=none
+    ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
+    ZSH_HIGHLIGHT_STYLES[arg0]=fg=green
+    ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
+    fi
+else
+    PROMPT='${debian_chroot:+($debian_chroot)}%n@%m:%~%# '
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in
+xterm*|rxvt*)
+    TERM_TITLE=$'\e]0;${debian_chroot:+($debian_chroot)}%n@%m: %~\a'
+    ;;
+*)
+    ;;
+esac
+
+new_line_before_prompt=yes
+precmd() {
+    # Print the previously configured title
+    print -Pnr -- "$TERM_TITLE"
+
+    # Print a new line before the prompt, but only if it is not the first line
+    if [ "$new_line_before_prompt" = yes ]; then
+    if [ -z "$_NEW_LINE_BEFORE_PROMPT" ]; then
+        _NEW_LINE_BEFORE_PROMPT=1
+    else
+        print ""
+    fi
+    fi
+}
+
+# enable color support of ls, less and man, and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+    alias diff='diff --color=auto'
+    alias ip='ip --color=auto'
+
+    export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
+    export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
+    export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
+    export LESS_TERMCAP_so=$'\E[01;33m'    # begin reverse video
+    export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
+    export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
+    export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
+
+    # Take advantage of $LS_COLORS for completion as well
+    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+fi
+
+# some more ls aliases
+alias ll='ls -l'
+alias la='ls -A'
+alias l='ls -CF'
+
+# enable auto-suggestions based on the history
+if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    . /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+    # change suggestion color
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#999'
+fi
+
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║  My alias
+#╚════════════════════════════════════════════════════════════════════════════╝
+alias pscpu='ps auxf | sort -nr -k 3 | grep'
+alias psmem='ps auxf | sort -nr -k 4 | grep'
+alias ping='ping -c 5'
+alias update='apt-get update && apt-get upgrade -y'
+alias iclear='apt-get autoremove && apt-get autoclean && apt-clean'
+alias inst='apt-get install'
+alias h='history'
+alias j='jobs -l'
+alias wifidump='stwl && clear && airodump-ng -i ${INFACE}'
+alias resbash=' . ~/.bashrc'
+alias imdk3='stwl && clear && mdk3 ${INFACE} d -c'
+alias iptab1='sysctl net.ipv4.ip_forward=1'
+alias iptab0='sysctl net.ipv4.ip_forward=0'
+alias end='shutdown'
+alias findip='geoiplookup'
+alias proxi='service tor start && proxychains'
+alias msf='service postgresql start && service apache2 start && msfconsole'
