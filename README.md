@@ -1,16 +1,18 @@
-### Hi there 👋
+-= W0ut =-
 
-<!--
-**W0ut/W0ut** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+WHY IS IT ALL?
 
-Here are some ideas to get you started:
+building scripts for easy and automatic use of hacking wifi and a little more 
+HOW TO INSTALL
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+~# cd Wout
+~# dos2unix install.sh
+~# chmod +x install.sh
+~# ./install.sh
+EXAMPLE
+
+~#./getpass.sh
+~#./getpass.sh /home/wifi.cap
+
+~#./hashcrack.sh
+~#./hashcrack.sh /home/filehash.hash
