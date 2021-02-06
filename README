@@ -99,3 +99,33 @@ ToRat
 paradoxiaRAT
     git clone https://github.com/quantumcored/paradoxiaRAT
         Paradoxia Remote Access Tool.
+        
+Создаем Encrypt persistence на Live usb Kali:
+            - Encrypt the partition with LUKS:
+                ☐ cryptsetup --verbose --verify-passphrase luksFormat /dev/sdb3
+
+            - Open the encrypted partition:
+                ☐ cryptsetup luksOpen /dev/sdb3 my_usb
+
+            - Create an ext3 filesystem and label it:
+                ☐ mkfs.ext3 /dev/mapper/my_usb
+                ☐ e2label /dev/mapper/my_usb persistence
+
+            - Mount the partition and create your persistence.conf so changes persist across reboots:
+                ☐ mkdir -p /mnt/my_usb
+                ☐ mount /dev/mapper/my_usb /mnt/my_usb
+                ☐ echo "/ union" > /mnt/my_usb/persistence.conf
+                ☐ umount /dev/mapper/my_usb
+                ☐ cryptsetup luksClose /dev/mapper/my_usb
+
+        Создаем дополнительный не шифрованный раздел на Live USB Kali:
+
+            - Format the fourth partition, label it "work".
+                ☐ mkfs.ext3 /dev/sdb4
+                ☐ e2label /dev/sdb4 work
+
+            - Mount this new partition and create a persistence.conf in it:
+                ☐ mkdir -p /mnt/usb
+                ☐ mount /dev/sdb4 /mnt/usb
+                ☐ echo "/ union" > /mnt/usb/persistence.conf
+                ☐ umount /mnt/usb
