@@ -59,11 +59,17 @@ RECOMMENDATION
 duf 
     git clone https://github.com/muesli/duf.git
         Disk Usage/Free Utility (Linux, BSD, macOS & Windows)
-
+        # git clone https://github.com/muesli/duf.git
+        # cd duf
+        # go build
+        
 --------------------------
 evillimiter
     git clone https://github.com/bitbrute/evillimiter.git
         Control the speed of the Internet connection in the network
+        # git clone https://github.com/bitbrute/evillimiter.git
+        # cd evillimiter
+        # sudo python3 setup.py install
 
 --------------------------
 Sn1per
