@@ -113,6 +113,8 @@ if [[ ${ANSWER} == "HTTP" || ${ANSWER} == "http" || -z ${ANSWER} ]]
         fi
         # ══ Change /etc/apache2/sites-available/000-default.conf ════════╝  END  ╚═
 fi
+service apache2 start &>/dev/null
+service apache2 reload &>/dev/null
 # ══ Change host file ════════╗ START ╔═
 THEHOST=`cat /etc/host | grep -o -a -E "${DOMAINIP}.*"`
         THEHOSTS=`cat /etc/hosts | grep -o -a -E "${DOMAINIP}.*"`
@@ -129,8 +131,7 @@ THEHOST=`cat /etc/host | grep -o -a -E "${DOMAINIP}.*"`
                 echo -e "${DOMAINIP} ${DOMAINNAME}" >> /etc/hosts
         fi
 # ══ Change host file ════════╝  END  ╚═
-service apache2 start &>/dev/null
-service apache2 reload &>/dev/null
+service apache2 restart &>/dev/null
 clear
 echo -e " ${NM}${WH}The server ${TYPEHOST}://${DOMAINNAME} is ${RD} running!"
 echo -e ""
