@@ -30,7 +30,7 @@
 # ══ Move cursor ════════╝  END  ╚═
 
 #╔═╗ VAR ╔════════════════════════════════════╗ START ╔════╗ */
-  TYPEHOST="http"
+    TYPEHOST="http"
 #╚═╝ VAR ╚════════════════════════════════════╝  END  ╚════╝ */
 
 # openssl s_client -connect your_server_ip:443
@@ -116,20 +116,22 @@ fi
 service apache2 start &>/dev/null
 service apache2 reload &>/dev/null
 # ══ Change host file ════════╗ START ╔═
+THEFILEHOST=`ls /etc | grep -aoE "^host$"`
+THEFILEHOSTS=`ls /etc | grep -aoE "^host$"`
 THEHOST=`cat /etc/host | grep -o -a -E "${DOMAINIP}.*"`
-        THEHOSTS=`cat /etc/hosts | grep -o -a -E "${DOMAINIP}.*"`
-        if [[ -n "${THEHOST}" ]]
-            then
-                sed -i "s/${THEHOST}.*/${DOMAINIP} ${DOMAINNAME}\n/" /etc/host
-            else
-                echo -e "${DOMAINIP} ${DOMAINNAME}" >> /etc/host
-        fi
-        if [[ -n "${THEHOSTS}" ]]
-            then
-                sed -i "s/${THEHOSTS}.*/${DOMAINIP} ${DOMAINNAME}\n/" /etc/hosts
-            else
-                echo -e "${DOMAINIP} ${DOMAINNAME}" >> /etc/hosts
-        fi
+THEHOSTS=`cat /etc/hosts | grep -o -a -E "${DOMAINIP}.*"`
+if [[ -n "${THEHOST}" && -n "${THEFILEHOST}" ]]
+    then
+        sed -i "s/${THEHOST}.*/${DOMAINIP} ${DOMAINNAME}\n/" /etc/host
+    else
+        echo -e "${DOMAINIP} ${DOMAINNAME}" >> /etc/host
+fi
+if [[ -n "${THEHOSTS}" && -n "${THEFILEHOSTS}" ]]
+    then
+        sed -i "s/${THEHOSTS}.*/${DOMAINIP} ${DOMAINNAME}\n/" /etc/hosts
+    else
+        echo -e "${DOMAINIP} ${DOMAINNAME}" >> /etc/hosts
+fi
 # ══ Change host file ════════╝  END  ╚═
 service apache2 restart &>/dev/null
 clear
