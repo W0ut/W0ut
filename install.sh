@@ -59,7 +59,7 @@ if [[ "${ItShell}" == "/usr/bin/zsh" ]]
     then
         if [[ -n "$File_ZSH" ]];
             then
-                THESHELL='~/.zshrc'
+                THESHELL=~/.zshrc
                 mv ~/.zshrc ~/zshrc_old &> /dev/null
                 cp ${ThisDir}/shell/zshrc ~/.zshrc &> /dev/null
                 dos2unix  ~/.zshrc &> /dev/null
@@ -67,7 +67,7 @@ if [[ "${ItShell}" == "/usr/bin/zsh" ]]
     else
         if [[ -n "$File_BSH" ]];
             then
-                THESHELL='~/.bashrc'
+                THESHELL=~/.bashrc
                 mv ~/.bashrc ~/bashrc_old &> /dev/null
                 cp ${ThisDir}/shell/bashrc ~/.bashrc &> /dev/null
                 dos2unix  ~/.bashrc &> /dev/null
@@ -208,6 +208,7 @@ if [[ ${ADDREP} == "y" ]]
                 FUNC_download_repositories
         done < ${ThisDir}/setting/list_dwn_soft
 fi
+echo -e ""
 echo -e ""
 # ══ download the recommended repositories ════════╝  END  ╚═
 
