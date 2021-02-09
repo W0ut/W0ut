@@ -182,7 +182,7 @@ FUNC_download_repositories() {
         else
             echo -e " ${SVC}${GR}[${YW}${DWNSOFT}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${RD}x${NM}${BL}]"
             sleep 1
-            echo -e " ${BL}[${BD}${RD}!${NM}${BL}] ${GR}Download ${DWNSOFT}"
+            echo -e " ${CL1}${RSC}${BL}[${BD}${RD}!${NM}${BL}] ${GR}Download ${DWNSOFT}"
             xterm -T "DOWNLOAD ${DWNSOFT}" -geometry 100x30 -e "cd /${USER}/soft && git clone ${DWNURL}"
             CHKSOFT=`ls /${USER}/soft | grep -E ${DWNSOFT}`
             if [[ -n "$CHKSOFT" ]]
@@ -197,6 +197,8 @@ FUNC_download_repositories() {
 }
 echo -en " ${WH}[${RD}!${WH}] ${GR}Download the recommended repositories? [${WH}N${GR}/y] ${CY}> ${RD}"
 read ADDREP
+clear
+echo -e ""
 if [[ ${ADDREP} == "y" ]]
     then
         WORD='Download status.'
@@ -226,7 +228,7 @@ echo -e ""
             else
                 echo -e " ${SVC}${GR}[${YW}${ChSoft}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${RD}x${NM}${BL}]"
                 sleep 1
-                echo -e " ${BL}[${BD}${RD}!${NM}${BL}] ${GR}Installing ${ChSoft}"
+                echo -e " ${CL1}${RSC}${BL}[${BD}${RD}!${NM}${BL}] ${GR}Installing ${ChSoft}"
                 xterm -T "INSTALLER ${ChSoft}" -geometry 100x30 -e "apt-get install ${ChSoft} -y"
                 Chk=`dpkg-query -W -f='${status}' ${ChSoft} 2>/dev/null | grep "install ok installed"`
                 if [[ -n "$Chk" ]]
@@ -261,12 +263,7 @@ echo -e "testword" > /${USER}/MyScript/dic/one/kill.txt
 
 # ══ Copy my scripts in new folder ════════╗ START ╔═
 cp -r ${ThisDir}/scripts/* /${USER}/MyScript/ &> /dev/null
-# cp ${ThisDir}/scripts/wifi/get_hash/get_hash.sh /${USER}/MyScript/wifi/get_hash/get_hash.sh &> /dev/null
-# cp ${ThisDir}/scripts/wifi/get_pin/wash.sh /${USER}/MyScript/wifi/get_pin/wash.sh &> /dev/null
-# cp ${ThisDir}/scripts/wifi/get_pass/crack.sh /${USER}/MyScript/wifi/get_pass/crack.sh &> /dev/null
-# cp ${ThisDir}/scripts/wifi/lockedwps.sh /${USER}/MyScript/wifi/lockedwps.sh &> /dev/null
-# cp ${ThisDir}/scripts/wifi/kill_wifi/killwifi.sh /${USER}/MyScript/wifi/kill_wifi/killwifi.sh &> /dev/null
-# cp ${ThisDir}/scripts/*.sh /${USER}/MyScript/ &> /dev/null
+
 cp ${ThisDir}/dic/* /${USER}/MyScript/dic/one/ &> /dev/null
 cp ${ThisDir}/setting/* /${USER}/MyScript/setting/ &> /dev/null
 cp ${ThisDir}/README /${USER}/MyScript/README &> /dev/null
