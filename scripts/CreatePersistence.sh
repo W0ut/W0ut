@@ -38,8 +38,17 @@ echo -en " ${WH}[${RD}!${WH}] ${GR}Create encrypted partition? [${WH}N${GR}/y] $
 read ANSWER
 if [[ ${ANSWER} == "y" ]]
     then
-        MNTCRYPTDISK=`cryptsetup --verbose --verify-passphrase luksFormat ${THEDISK} && cryptsetup luksOpen ${THEDISK} my_usb && mkfs.ext3 /dev/mapper/my_usb && e2label /dev/mapper/my_usb secret &&  mkdir -p /mnt/my_usb && mount /dev/mapper/my_usb /mnt/my_usb && echo "/ union" > /mnt/my_usb/persistence.conf && umount /dev/mapper/my_usb && cryptsetup luksClose /dev/mapper/my_usb`
+        clear
+        echo -e ""
+        echo -e " ${NM}${PR}=============== encrypted ================="
+        echo -e ""
+        cryptsetup --verbose --verify-passphrase luksFormat ${THEDISK} && cryptsetup luksOpen ${THEDISK} my_usb
+        MNTCRYPTDISK=`mkfs.ext3 /dev/mapper/my_usb && e2label /dev/mapper/my_usb secret &&  mkdir -p /mnt/my_usb && mount /dev/mapper/my_usb /mnt/my_usb && echo "/ union" > /mnt/my_usb/persistence.conf && umount /dev/mapper/my_usb && cryptsetup luksClose /dev/mapper/my_usb`
     else
+        clear
+        echo -e ""
+        echo -e " ${NM}${PR}============= NO encrypted ================"
+        echo -e ""
         MNTDISK=`mkfs.ext3 -L persistence ${THEDISK} && e2label ${THEDISK} persistence &&  mkdir -p /mnt/usb && mount ${THEDISK} /mnt/usb && echo "/ union" > /mnt/usb/persistence.conf && umount ${THEDISK}`
 fi
 clear
@@ -47,7 +56,15 @@ echo -e ""
 FUNC_isMounted
 if [[ -n "${THEMNT}" ]]
     then
-        echo -e " ${WH}[${RD}!${WH}] ${GR}Disk ${THEDISK} mounted!"
+        if [[ ${ANSWER} == "y" ]]
+            then
+                echo -e " ${NM}${PR}=============== encrypted ================="
+                echo -e ""
+            else
+                echo -e " ${NM}${PR}============= NO encrypted ================"
+                echo -e ""
+        fi
+        echo -e " ${WH}[${RD}!${WH}] ${GR}Disk ${THEDISK} create!"
     else
         echo -e " ${WH}[${RD}!${WH}] ${GR}Something went wrong!"
 fi

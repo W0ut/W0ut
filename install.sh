@@ -38,6 +38,12 @@
 
 apt-get install dos2unix &> /dev/null
 apt-get install xterm &> /dev/null
+apt-get install apt-transport-https &> /dev/null
+
+# ══ Add Sublime text 3 ════════╗ START ╔═
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - &> /dev/null
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list &> /dev/null
+# ══ Add Sublime text 3 ════════╝  END  ╚═
 
 clear
 dos2unix ${ThisDir}/setting/* &> /dev/null
@@ -53,6 +59,7 @@ if [[ "${ItShell}" == "/usr/bin/zsh" ]]
     then
         if [[ -n "$File_ZSH" ]];
             then
+                THESHELL='~/.zshrc'
                 mv ~/.zshrc ~/zshrc_old &> /dev/null
                 cp ${ThisDir}/shell/zshrc ~/.zshrc &> /dev/null
                 dos2unix  ~/.zshrc &> /dev/null
@@ -60,6 +67,7 @@ if [[ "${ItShell}" == "/usr/bin/zsh" ]]
     else
         if [[ -n "$File_BSH" ]];
             then
+                THESHELL='~/.bashrc'
                 mv ~/.bashrc ~/bashrc_old &> /dev/null
                 cp ${ThisDir}/shell/bashrc ~/.bashrc &> /dev/null
                 dos2unix  ~/.bashrc &> /dev/null
@@ -161,6 +169,48 @@ done < ${ThisDir}/setting/list_create_folder_and_files
     echo -e ""
 # ══ Insert data for TelegramBot ════════╝  END  ╚═
 
+# ══ download the recommended repositories ════════╗ START ╔═
+FUNC_download_repositories() {
+    WORD=$DWNSOFT
+    MAX="30"
+    CHKSOFT=`ls /${USER}/soft | grep -E ${DWNSOFT}`
+    FUNC_create_tabl
+    if [[ -n "$CHKSOFT" ]]
+        then
+            echo -e " ${GR}[${YW}${DWNSOFT}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${GR}✔${NM}${BL}]"
+            sleep 1
+        else
+            echo -e " ${SVC}${GR}[${YW}${DWNSOFT}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${RD}x${NM}${BL}]"
+            sleep 1
+            echo -e " ${BL}[${BD}${RD}!${NM}${BL}] ${GR}Download ${DWNSOFT}"
+            xterm -T "DOWNLOAD ${DWNSOFT}" -geometry 100x30 -e "cd /${USER}/soft && git clone ${DWNURL}"
+            CHKSOFT=`ls /${USER}/soft | grep -E ${DWNSOFT}`
+            if [[ -n "$CHKSOFT" ]]
+                then
+                    echo -e " ${CL1}${RSC}${GR}[${YW}${DWNSOFT}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${GR}✔${NM}${BL}]"
+                    sleep 1
+                else
+                    echo -e " ${CL1}${RSC}${GR}[${YW}${DWNSOFT}${GR}]${WH}${max_lf}${max_rh}${BL}[${BD}${RD}x${NM}${BL}]"
+                    sleep 1
+            fi
+    fi
+}
+echo -en " ${WH}[${RD}!${WH}] ${GR}Download the recommended repositories? [${WH}N${GR}/y] ${CY}> ${RD}"
+read ADDREP
+if [[ ${ADDREP} == "y" ]]
+    then
+        WORD='Download status.'
+        MAX="34"
+        FUNC_create_tabl
+        echo -e " ${NM}${GR}[${YW}${max_lf}${BD}${GR}Download status${NM}${YW}${max_rh}${GR}]"
+        while read DWNURL DWNSOFT
+            do
+                FUNC_download_repositories
+        done < ${ThisDir}/setting/list_dwn_soft
+fi
+echo -e ""
+# ══ download the recommended repositories ════════╝  END  ╚═
+
 # ══ Function for checking the installation and installing ════════╗ START ╔═
     FUNC_check_install() {    
         Chk=`dpkg-query -W -f='${status}' ${ChSoft} 2>/dev/null | grep "install ok installed"`
@@ -189,7 +239,7 @@ done < ${ThisDir}/setting/list_create_folder_and_files
                 fi
         fi
    }
-# ══ Function for checking the installation and installing ════════╝  END  ╚═   
+# ══ Function for checking the installation and installing ════════╝  END  ╚═
 
 # ══ Сhecking the installation ════════╗ START ╔═
 WORD='installation status.'
@@ -209,14 +259,13 @@ echo -e "testword" > /${USER}/MyScript/dic/one/kill.txt
 # ══ We fill the files ════════╝  END  ╚═
 
 # ══ Copy my scripts in new folder ════════╗ START ╔═
-cp ${ThisDir}/scripts/wifi/get_hash/get_hash.sh /${USER}/MyScript/wifi/get_hash/ &> /dev/null
-cp ${ThisDir}/scripts/wifi/get_pin/wash.sh /${USER}/MyScript/wifi/get_pin/wash.sh &> /dev/null
-cp ${ThisDir}/scripts/wifi/get_pass/crack.sh /${USER}/MyScript/wifi/get_pass/crack.sh &> /dev/null
-cp ${ThisDir}/scripts/wifi/lockedwps.sh /${USER}/MyScript/wifi/lockedwps.sh &> /dev/null
-cp ${ThisDir}/scripts/wifi/kill_wifi/killwifi.sh /${USER}/MyScript/wifi/kill_wifi/killwifi.sh &> /dev/null
-cp ${ThisDir}/scripts/hashcrack.sh /${USER}/MyScript/hashcrack.sh &> /dev/null
-cp ${ThisDir}/scripts/chinterface.sh /${USER}/MyScript/chinterface.sh &> /dev/null
-cp ${ThisDir}/scripts/hpingAttack.sh /${USER}/MyScript/hpingAttack.sh &> /dev/null
+cp -r ${ThisDir}/scripts/* /${USER}/MyScript/ &> /dev/null
+# cp ${ThisDir}/scripts/wifi/get_hash/get_hash.sh /${USER}/MyScript/wifi/get_hash/get_hash.sh &> /dev/null
+# cp ${ThisDir}/scripts/wifi/get_pin/wash.sh /${USER}/MyScript/wifi/get_pin/wash.sh &> /dev/null
+# cp ${ThisDir}/scripts/wifi/get_pass/crack.sh /${USER}/MyScript/wifi/get_pass/crack.sh &> /dev/null
+# cp ${ThisDir}/scripts/wifi/lockedwps.sh /${USER}/MyScript/wifi/lockedwps.sh &> /dev/null
+# cp ${ThisDir}/scripts/wifi/kill_wifi/killwifi.sh /${USER}/MyScript/wifi/kill_wifi/killwifi.sh &> /dev/null
+# cp ${ThisDir}/scripts/*.sh /${USER}/MyScript/ &> /dev/null
 cp ${ThisDir}/dic/* /${USER}/MyScript/dic/one/ &> /dev/null
 cp ${ThisDir}/setting/* /${USER}/MyScript/setting/ &> /dev/null
 cp ${ThisDir}/README /${USER}/MyScript/README &> /dev/null
@@ -237,14 +286,21 @@ chmod -R +x /${USER}/MyScript/
 # ══ Add rights ════════╝  END  ╚═
 
 # ══ Add My alias ════════╗ START ╔═
-echo -e "alias getpass='cd /${USER}/MyScript/wifi/get_pass/ && ./crack.sh'" >> ~/.zshrc
-echo -e "alias hashcrack='cd /${USER}/MyScript/ && ./hashcrack.sh'" >> ~/.zshrc
-echo -e "alias ifindmac='cd /${USER}/MyScript/ && ./maps.sh'" >> ~/.zshrc
-echo -e "alias getpin='cd /${USER}/MyScript/wifi/get_pin/ && ./wash.sh'" >> ~/.zshrc
-echo -e "alias gethash='cd /${USER}/MyScript/wifi/get_hash/ && ./get_hash.sh'" >> ~/.zshrc
-echo -e "alias ikill='cd /${USER}/MyScript/wifi/kill_wifi/ && ./killwifi.sh'" >> ~/.zshrc
-echo -e "alias idos='cd /${USER}/MyScript/ && ./hpingAttack.sh'" >> ~/.zshrc
-echo -e "alias ichwl='cd /${USER}/MyScript/ && ./chinterface.sh'" >> ~/.zshrc
+echo -e "alias getpass='cd /${USER}/MyScript/wifi/get_pass/ && ./crack.sh'" >> ${THESHELL}
+echo -e "alias hashcrack='cd /${USER}/MyScript/ && ./hashcrack.sh'" >> ${THESHELL}
+echo -e "alias ifindmac='cd /${USER}/MyScript/ && ./maps.sh'" >> ${THESHELL}
+echo -e "alias getpin='cd /${USER}/MyScript/wifi/get_pin/ && ./wash.sh'" >> ${THESHELL}
+echo -e "alias gethash='cd /${USER}/MyScript/wifi/get_hash/ && ./get_hash.sh'" >> ${THESHELL}
+echo -e "alias ikill='cd /${USER}/MyScript/wifi/kill_wifi/ && ./killwifi.sh'" >> ${THESHELL}
+echo -e "alias idos='cd /${USER}/MyScript/ && ./hpingAttack.sh'" >> ${THESHELL}
+echo -e "alias ichwl='cd /${USER}/MyScript/ && ./chinterface.sh'" >> ${THESHELL}
+echo -e "alias webstart='cd /${USER}/MyScript/ && ./webstart.sh'" >> ${THESHELL}
+if [[ ${ADDREP} == "y" ]]
+    then
+        echo -e "alias cupp='cd /${USER}/soft/cupp/ && python3 cupp.py'" >> ${THESHELL}
+        echo -e "alias socialphish='cd /${USER}/soft/SocialPhish/ && ./socialphish.sh'" >> ${THESHELL}
+        echo -e "alias duf='cd /${USER}/soft/duf/ && ./duf'" >> ${THESHELL}
+fi
 # ══ Add My alias ════════╝  END  ╚═
 
 # ══ Setting for Tor, Privoxy and Proxychains ════════╗ START ╔═
@@ -318,6 +374,10 @@ echo -e " ${BL}[${BD}${RD}!${NM}${BL}]${YW}Folder with all dictionaries${WH}....
 echo -e " ${BL}[${BD}${RD}!${NM}${BL}]${YW}File with found Wifi passwords${WH}...............${CY}:${WH} /${USER}/MyOUTPUT/wifi/${RD}WIFI_PASS.txt"
 echo -e " ${BL}[${BD}${RD}!${NM}${BL}]${YW}File with cracked passwords${WH}..................${CY}:${WH} /${USER}/MyOUTPUT/brut/${RD}found_pass.txt"
 echo -e " ${BL}[${BD}${RD}!${NM}${BL}]${YW}File to generate a dictionary with passwords${WH}.${CY}:${WH} /${USER}/MyScript/dic/${RD}pluspass.txt"
+if [[ ${ADDREP} == "y" ]]
+    then
+        echo -e " ${BL}[${BD}${RD}!${NM}${BL}]${YW}Аolder with downloaded repositories${WH}..........${CY}:${WH} /${USER}/soft/"
+fi
 echo -e ""
 echo -e " ${NM}${WH}-= ${BD}${RD}END ${NM}${WH}=-" 
 

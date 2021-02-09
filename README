@@ -100,6 +100,10 @@ KitHack
 ToRat
     git clone https://github.com/lu4p/ToRat.git
         A Cross Platform Remote Administration tool written in Go using Tor as its transport mechanism currently supporting Windows, Linux, MacOS clients.
+        # git clone https://github.com/lu4p/ToRat.git
+        # cd ./ToRat
+        # sudo docker build . -t torat
+        # sudo docker run -it -v "$(pwd)"/dist:/dist_ext torat
 
 --------------------------
 paradoxiaRAT
@@ -108,7 +112,19 @@ paradoxiaRAT
 
 
 --- ✄ -----------------------
+wifipumpkin3
+    git clone https://github.com/P0cL4bs/wifipumpkin3
+        wifipumpkin3 is powerful framework for rogue access point attack, written in Python, that allow and offer to security researchers, red teamers and reverse engineers to mount a wireless network to conduct a man-in-the-middle attack.
+        # sudo apt install libssl-dev libffi-dev build-essential
+        # git clone https://github.com/P0cL4bs/wifipumpkin3.git
+        # cd wifipumpkin3
+        # sudo apt install python3-pyqt5
+        # sudo python3 setup.py install
+        # cd /usr/lib/x86_64-linux-gnu/
+        # ln -s -f libc.a liblibc.a
+        # wifipumpkin3
 
+--- ✄ -----------------------
 Создаем Encrypt persistence на Live usb Kali:
             - Encrypt the partition with LUKS:
                 ☐ cryptsetup --verbose --verify-passphrase luksFormat /dev/sdb3

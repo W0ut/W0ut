@@ -374,7 +374,75 @@ fi
 	  fi
 	}
 #╚═══════════════════════════════════════════════════════════════════════ End ═╝
-
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Connect to WIFI
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function connwifi() {
+        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+        if [[ -n "$IMANAGED" ]]
+            then
+                echo -e ""
+                timeout 3 nmcli d wifi list ifname ${IMANAGED}
+                echo -e ""
+                echo -en " ${WH}[${RD}!${WH}] ${GR}Enter Name Wifi point ${CY}> ${RD}"
+                read WIFINAME
+                echo -e ""
+                echo -en " ${WH}[${RD}!${WH}] ${GR}Inter Password ${CY}> ${RD}"
+                read WIFIPASS
+                if [[ -n "${WIFINAME}" && -n "${WIFIPASS}" ]]
+                    then
+                        WIFICONN=`nmcli d wifi connect "${WIFINAME}" password ${WIFIPASS} ifname ${IMANAGED} | grep -E -a -o "successfully activated"`
+                        if [[ -n "${WIFICONN}" ]]
+                            then
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
+                                echo ""
+                            else
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Not connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
+                                echo ""
+                        fi    
+                    else
+                        clear
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Password or wifi putsy${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+    }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Disconnect to WIFI
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function diswifi() {
+        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+        if [[ -n "$IMANAGED" ]]
+            then
+                echo -e ""
+                WIFIDIS=`nmcli d disconnect ${IMANAGED} | grep -E -a -o "successfully disconnected"`
+                if [[ -n "${WIFIDIS}" ]]
+                    then
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}${IMANAGED} Disconnected!${NM}${WH} ."
+                        echo ""
+                    else
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Something went wrong${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+    }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║  Start airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝
@@ -408,7 +476,6 @@ fi
 	  fi
 	}
 #╚═══════════════════════════════════════════════════════════════════════ End ═╝
-
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║  Stop airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝

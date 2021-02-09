@@ -208,6 +208,75 @@ fi
     function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
 #╚═══════════════════════════════════════════════════════════════════════ End ═╝
 #╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Connect to WIFI
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function connwifi() {
+        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+        if [[ -n "$IMANAGED" ]]
+            then
+                echo -e ""
+                timeout 3 nmcli d wifi list ifname ${IMANAGED}
+                echo -e ""
+                echo -en " ${WH}[${RD}!${WH}] ${GR}Enter Name Wifi point ${CY}> ${RD}"
+                read WIFINAME
+                echo -e ""
+                echo -en " ${WH}[${RD}!${WH}] ${GR}Inter Password ${CY}> ${RD}"
+                read WIFIPASS
+                if [[ -n "${WIFINAME}" && -n "${WIFIPASS}" ]]
+                    then
+                        WIFICONN=`nmcli d wifi connect "${WIFINAME}" password ${WIFIPASS} ifname ${IMANAGED} | grep -E -a -o "successfully activated"`
+                        if [[ -n "${WIFICONN}" ]]
+                            then
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
+                                echo ""
+                            else
+                                echo ""
+                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Not connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
+                                echo ""
+                        fi    
+                    else
+                        clear
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Password or wifi putsy${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+    }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
+#║  Disconnect to WIFI
+#╚═════════════════════════════════════════════════════════════════════════════╝
+    function diswifi() {
+        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+        if [[ -n "$IMANAGED" ]]
+            then
+                echo -e ""
+                WIFIDIS=`nmcli d disconnect ${IMANAGED} | grep -E -a -o "successfully disconnected"`
+                if [[ -n "${WIFIDIS}" ]]
+                    then
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}${IMANAGED} Disconnected!${NM}${WH} ."
+                        echo ""
+                    else
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Something went wrong${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+    }
+#╚═══════════════════════════════════════════════════════════════════════ End ═╝
+#╔═════════════════════════════════════════════════════════════════════════════╗
 #║  Start airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝
     function stwl() {
@@ -231,11 +300,11 @@ fi
                                 echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
                                 echo ""
                         fi
-                            else
-                                clear
-                                echo ""
-                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
-                                echo ""
+                    else
+                        clear
+                        echo ""
+                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                        echo ""
                 fi
         fi
     }
@@ -281,6 +350,15 @@ function stpwl() {
         history -r
     }
 #╚══════════════════════════════════════════════════════════════════════ End ═╝
+
+# ══ small functions to run scripts from the program folder ════════╗ START ╔═
+    
+    seeker() {
+        xterm -T "NGROK" -geometry 140*40 -e "cd /${USER}/soft && ./ngrok http 8080" &
+        cd /${USER}/soft/seeker/ && ./seeker.py -t manual
+    }
+
+# ══ small functions to run scripts from the program folder ════════╝  END  ╚═
 
 if [ "$color_prompt" = yes ]; then
     PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)──}(%B%F{%(#.red.blue)}%n%(#.💀.㉿)%m%b%F{%(#.blue.green)})-[%F{%(#.green)}ip:%F{%(#.yellow.cyan)}$INETIP%F{%(#.green)}/%F{%(#.yellow.cyan)}$CITY%F{%(#.blue.green)}]-[%b%F{%(#.red)}$StPROXY%F{%(#.blue.green)}]-[%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
