@@ -429,34 +429,49 @@
 #╔══════════════════════════════════════════════╗
 #║  Basic function
 #╚══════════════════════════════════════════════╝
-    trap FUNC_exit_function SIGINT
-    INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'`
-        if [[ -n "$INFACE" ]]
-            then
-                FUNC_Washed
-                clear
-                echo -en "${NM}${DWC}${RGC}${RGC}${SVC} "
-                while [[ "$tm" -ne 0 ]]; do
-                    if [[ "$tm" -lt 10 ]];
-                        then
-                            echo -en "${RSC}${NM}${WH}[${NM}${RD}!${NM}${WH}] ${BD}${GR}Search targets for attack ... ${BD}${RD} 0$tm"
-                        else
-                            echo -en "${RSC}${NM}${WH}[${NM}${RD}!${NM}${WH}] ${BD}${GR}Search targets for attack ... ${BD}${RD} $tm"
-                    fi
-                    tm=$(($tm-1))
-                    sleep 1
-                    if [[ "$tm" -eq "0" ]];
-                        then
-                            clear
-                            FUNC_Grepmac
-                            FUNC_Get
-                            FUNC_exit_function
-                    fi
-                done
-            else
-                clear
-                echo ""
-                echo -e ${NM}${WH}"${NM}${WH}  [${NM}${RD}!${NM}${WH}] ${NM}Wireless Card${NM}${RD} Not Found${NM}${WH} ."
-                FUNC_exit_function
-        fi
+trap FUNC_exit_function SIGINT
+INFACENUM=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}' | wc -l`
+if [[ "$INFACENUM" -gt 1 ]];
+    then
+        echo -e " ${NM}${PR}╔════════════════════════╗"
+        echo -e " ${NM}${PR}║    ${BD}${YW}SELECT INTERFACE    ${NM}${PR}║"
+        echo -e " ${NM}${PR}╚════════════════════════╝"
+        echo -en "${BD}${WH}"
+        iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' 2>/dev/null
+        echo -e " ${NM}${PR}╚════════════════════════╝"
+        echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
+        read NUM
+        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' | grep $NUM | awk '{print $2}'`
+        clear
+    else
+        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'`
+fi
+if [[ -n "$INFACE" ]]
+    then
+        FUNC_Washed
+        clear
+        echo -en "${NM}${DWC}${RGC}${RGC}${SVC} "
+        while [[ "$tm" -ne 0 ]]; do
+            if [[ "$tm" -lt 10 ]];
+                then
+                    echo -en "${RSC}${NM}${WH}[${NM}${RD}!${NM}${WH}] ${BD}${GR}Search targets for attack ... ${BD}${RD} 0$tm"
+                else
+                    echo -en "${RSC}${NM}${WH}[${NM}${RD}!${NM}${WH}] ${BD}${GR}Search targets for attack ... ${BD}${RD} $tm"
+            fi
+            tm=$(($tm-1))
+            sleep 1
+            if [[ "$tm" -eq "0" ]];
+                then
+                    clear
+                    FUNC_Grepmac
+                    FUNC_Get
+                    FUNC_exit_function
+            fi
+        done
+    else
+        clear
+        echo ""
+        echo -e ${NM}${WH}"${NM}${WH}  [${NM}${RD}!${NM}${WH}] ${NM}Wireless Card${NM}${RD} Not Found${NM}${WH} ."
+        FUNC_exit_function
+fi
 #╚══════════════════════════════  End Basic function ═╝
