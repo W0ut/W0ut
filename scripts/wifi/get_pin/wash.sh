@@ -271,7 +271,7 @@
                 if [[ -n "$PWR" && "$PWR" -gt "10" ]];
                     then
                         echo -en "${RSC}${BD}${RD}Start attack."
-                        xterm -e aireplay-ng wlan0mon -1 120 -a $BSSID -e $ESSID &> /dev/null &
+                        xterm -e "aireplay-ng $INFACE -1 120 -a $BSSID -e $ESSID" &> /dev/null &
                         Aireplay_PID="$!"
                         disown $Aireplay_PID
                         if [[ -n "$CHANNEL" ]];
