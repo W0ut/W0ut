@@ -96,10 +96,10 @@
     FUNC_exit_function() {
         if [[ "Num_targets" -eq "0" ]]
             then
-                killall reaver &>/dev/null
-                killall wash &>/dev/null
-                killall xterm &>/dev/null
-                killall tail &>/dev/null
+                kill -9 $Wash_PID &>/dev/null
+                kill -9 $xterm_PID &> /dev/null
+                kill -9 $Reaver_PID &> /dev/null
+                kill -9 $Aireplay_PID &> /dev/null
                 OST_TARGET=$(($OST_TARGET*2+1))
                 rc_dw_tr="\e[${OST_TARGET}B"
                 echo -e "${NM}${rc_dw_tr}"
