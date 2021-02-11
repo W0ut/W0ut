@@ -378,40 +378,101 @@ fi
 #║  Connect to WIFI
 #╚═════════════════════════════════════════════════════════════════════════════╝
     function connwifi() {
-        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
-        if [[ -n "$IMANAGED" ]]
+        INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | wc -l`
+        if [[ "${INFACENUM}" -gt 1 ]];
             then
-                echo -e ""
-                timeout 3 nmcli d wifi list ifname ${IMANAGED}
-                echo -e ""
-                echo -en " ${WH}[${RD}!${WH}] ${GR}Enter Name Wifi point ${CY}> ${RD}"
-                read WIFINAME
-                echo -e ""
-                echo -en " ${WH}[${RD}!${WH}] ${GR}Inter Password ${CY}> ${RD}"
-                read WIFIPASS
-                if [[ -n "${WIFINAME}" && -n "${WIFIPASS}" ]]
+                echo -e " ${NM}${PR}╔════════════════════════╗"
+                echo -e " ${NM}${PR}║    ${BD}${YW}SELECT INTERFACE    ${NM}${PR}║"
+                echo -e " ${NM}${PR}╚════════════════════════╝"
+                echo -en "${BD}${WH}"
+                iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | nl -s ') ' 2>/dev/null
+                echo -e " ${NM}${PR}╚════════════════════════╝"
+                echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
+                read NUM
+                clear
+                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                clear
+                if [[ -n "${IMANAGED}" ]]
                     then
-                        WIFICONN=`nmcli d wifi connect "${WIFINAME}" password ${WIFIPASS} ifname ${IMANAGED} | grep -E -a -o "successfully activated"`
-                        if [[ -n "${WIFICONN}" ]]
+                        timeout 3 nmcli d wifi list ifname ${IMANAGED}
+                        echo -e ""
+                        echo -en " ${WH}[${RD}!${WH}] ${GR}Enter Name Wifi point (ESSID) ${CY}> ${RD}"
+                        read WIFINAME
+                        echo -e ""
+                        echo -en " ${WH}[${RD}!${WH}] ${GR}Inter Password ${CY}> ${RD}"
+                        read WIFIPASS
+                        if [[ -n "${WIFINAME}" && -n "${WIFIPASS}" ]]
                             then
-                                echo ""
-                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
-                                echo ""
+                                WIFICONN=`nmcli d wifi connect "${WIFINAME}" password ${WIFIPASS} ifname ${IMANAGED}`
+                                CHECKCON=`iwconfig 2>/dev/null | grep "${IMANAGED}" | grep "ESSID:\"${WIFINAME}\"" | awk '{print $1}'`
+                                if [[ -n "${CHECKCON}" ]]
+                                    then
+                                        echo ""
+                                        echo -e " ${WH}[${RD}!${WH}] ${GR}Connected to ${NM}${BD}${CY}${WIFINAME}${NM}${WH} ."
+                                        echo ""
+                                    else
+                                        echo ""
+                                        echo -e " ${WH}[${RD}!${WH}] ${GR}Not connected to ${NM}${BD}${CY}${WIFINAME}${NM}${WH} ."
+                                        echo ""
+                                fi    
                             else
+                                clear
                                 echo ""
-                                echo -e "  ${WH}[${RD}!${WH}] ${GR}Not connected to ${NM}${BD}${WIFINAME}${NM}${WH} ."
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}Password or ESSID putsy${NM}${WH} ."
                                 echo ""
-                        fi    
+                        fi
                     else
                         clear
                         echo ""
-                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Password or wifi putsy${NM}${WH} ."
+                        echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                        echo ""
+                fi                    
+        fi
+        if [[ "${INFACENUM}" -eq 1 ]];
+            then
+                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+                if [[ -n "${IMANAGED}" ]]
+                    then
+                        clear
+                        timeout 3 nmcli d wifi list ifname ${IMANAGED}
+                        echo -e ""
+                        echo -en " ${WH}[${RD}!${WH}] ${GR}Enter Name Wifi point (ESSID) ${CY}> ${RD}"
+                        read WIFINAME
+                        echo -e ""
+                        echo -en " ${WH}[${RD}!${WH}] ${GR}Inter Password ${CY}> ${RD}"
+                        read WIFIPASS
+                        if [[ -n "${WIFINAME}" && -n "${WIFIPASS}" ]]
+                            then
+                                WIFICONN=`nmcli d wifi connect "${WIFINAME}" password ${WIFIPASS} ifname ${IMANAGED}`
+                                CHECKCON=`iwconfig 2>/dev/null | grep "${IMANAGED}" | grep "ESSID:\"${WIFINAME}\"" | awk '{print $1}'`
+                                if [[ -n "${CHECKCON}" ]]
+                                    then
+                                        echo ""
+                                        echo -e " ${WH}[${RD}!${WH}] ${GR}Connected to ${NM}${BD}${CY}${WIFINAME}${NM}${WH} ."
+                                        echo ""
+                                    else
+                                        echo ""
+                                        echo -e " ${WH}[${RD}!${WH}] ${GR}Not connected to ${NM}${BD}${CY}${WIFINAME}${NM}${WH} ."
+                                        echo ""
+                                fi    
+                            else
+                                clear
+                                echo ""
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}Password or ESSID putsy${NM}${WH} ."
+                                echo ""
+                        fi
+                    else
+                        clear
+                        echo ""
+                        echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
                         echo ""
                 fi
-            else
+        fi
+        if [[ "${INFACENUM}" -eq 0 || -z "${INFACENUM}" ]];
+            then
                 clear
                 echo ""
-                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
                 echo ""
         fi
     }
@@ -420,25 +481,80 @@ fi
 #║  Disconnect to WIFI
 #╚═════════════════════════════════════════════════════════════════════════════╝
     function diswifi() {
-        IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
-        if [[ -n "$IMANAGED" ]]
+        INFACENUM=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | wc -l`
+        if [[ "${INFACENUM}" -gt 1 ]];
             then
-                echo -e ""
-                WIFIDIS=`nmcli d disconnect ${IMANAGED} | grep -E -a -o "successfully disconnected"`
-                if [[ -n "${WIFIDIS}" ]]
+                echo -e " ${NM}${PR}╔════════════════════════╗"
+                echo -e " ${NM}${PR}║    ${BD}${YW}SELECT INTERFACE    ${NM}${PR}║"
+                echo -e " ${NM}${PR}╚════════════════════════╝"
+                echo -en "${BD}${WH}"
+                iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' 2>/dev/null
+                echo -e " ${NM}${PR}╚════════════════════════╝"
+                echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
+                read NUM
+                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                if [[ -n "${IMANAGED}" ]]
                     then
-                        echo ""
-                        echo -e "  ${WH}[${RD}!${WH}] ${GR}${IMANAGED} Disconnected!${NM}${WH} ."
-                        echo ""
+                        clear
+                        WIFIDIS=`nmcli d disconnect ${IMANAGED}`
+                        CHECKDIS=`iwconfig 2>/dev/null | grep "${IMANAGED}" | grep 'ESSID:off/any' | awk '{print $1}'`
+                        if [[ -n "${CHECKDIS}" ]]
+                            then
+                                echo ""
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}${IMANAGED} Disconnected!${NM}${WH} ."
+                                echo ""
+                            else
+                                echo ""
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}Something went wrong${NM}${WH} ."
+                                echo ""
+                        fi
                     else
+                        clear
                         echo ""
-                        echo -e "  ${WH}[${RD}!${WH}] ${GR}Something went wrong${NM}${WH} ."
+                        echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
                         echo ""
                 fi
             else
                 clear
                 echo ""
-                echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+        if [[ "${INFACENUM}" -eq 1 ]];
+            then
+                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1}'`
+                if [[ -n "${IMANAGED}" ]]
+                    then
+                        clear
+                        WIFIDIS=`nmcli d disconnect ${IMANAGED}`
+                        CHECKDIS=`iwconfig 2>/dev/null | grep "${IMANAGED}" | grep 'ESSID:off/any' | awk '{print $1}'`
+                        if [[ -n "${CHECKDIS}" ]]
+                            then
+                                echo ""
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}${IMANAGED} Disconnected!${NM}${WH} ."
+                                echo ""
+                            else
+                                echo ""
+                                echo -e " ${WH}[${RD}!${WH}] ${GR}Something went wrong${NM}${WH} ."
+                                echo ""
+                        fi
+                    else
+                        clear
+                        echo ""
+                        echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                        echo ""
+                fi
+            else
+                clear
+                echo ""
+                echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+                echo ""
+        fi
+        if [[ "${INFACENUM}" -eq 0 || -z "${INFACENUM}" ]];
+            then
+                clear
+                echo ""
+                echo -e " ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
                 echo ""
         fi
     }
@@ -446,64 +562,121 @@ fi
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║  Start airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝
-	function stwl() {
-	  INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
-	  if [[ -z "$INFACE" ]]
-		then
-		  IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
-			if [[ -n "$IMANAGED" ]]
-			  then
-				airmon-ng start $IMANAGED &>/dev/null
-				INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
-				  if [[ -n "$INFACE" ]]
-					then
-						clear
-						echo ""
-						echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${BD}${GR} STARTED${NM}${WH} ."
-						echo ""
-					else
-						clear
-						echo ""
-						echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${NM}${RD} Not Found${NM}${WH} ."
-						echo ""
-				  fi
-					else
-					  clear
-					  echo ""
-					  echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${NM}${RD} Not Found${NM}${WH} ."
-					  echo ""
-			fi
-	  fi
-	}
+function stwl() {
+    INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | wc -l`
+    if [[ "${INFACENUM}" -gt 1 ]];
+        then
+            echo -e " ${NM}${PR}╔════════════════════════╗"
+            echo -e " ${NM}${PR}║    ${BD}${YW}SELECT INTERFACE    ${NM}${PR}║"
+            echo -e " ${NM}${PR}╚════════════════════════╝"
+            echo -en "${BD}${WH}"
+            iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | nl -s ') ' 2>/dev/null
+            echo -e " ${NM}${PR}╚════════════════════════╝"
+            echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
+            read NUM
+            clear
+            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            airmon-ng start $IMANAGED &>/dev/null
+            INFACE=`iwconfig 2>/dev/null | grep "${IMANAGED}.*" | grep 'Mode:Monitor' | awk '{print $1}'`
+            if [[ -n "$INFACE" ]]
+                then
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode Monitor ${NM}${WH}-> ${NM}${BD}STARTED${NM}${WH} ."
+                    echo ""
+                else
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo ""
+            fi
+    fi
+    if [[ "${INFACENUM}" -eq 1 ]];
+        then
+            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}'`
+            airmon-ng start $IMANAGED &>/dev/null
+            INFACE=`iwconfig 2>/dev/null | grep "${IMANAGED}.*" | grep 'Mode:Monitor' | awk '{print $1}'`
+            if [[ -n "$INFACE" ]]
+                then
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode Monitor ${NM}${WH}-> ${NM}${BD}STARTED${NM}${WH} ."
+                    echo ""
+                else
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo ""
+            fi
+    fi
+    if [[ "${INFACENUM}" -eq 0 || -z "${INFACENUM}" ]];
+        then
+            clear
+            echo ""
+            echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+            echo ""
+    fi
+}
 #╚═══════════════════════════════════════════════════════════════════════ End ═╝
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║  Stop airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝
-  function stpwl() {
-	INFACE=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
-		if [[ -n "$INFACE" ]]
-		then
-		  IMANAGED=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
-			if [[ -n "$IMANAGED" ]]
-			  then
-				clear
-				airmon-ng stop $IMANAGED &>/dev/null
-				echo ""
-				echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${NM}${RD} STOPED${NM}${WH} ."
-				echo ""
-			  else
-				clear
-				echo ""
-				echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${NM}${RD} Not Found${NM}${WH} ."
-				echo ""
-			fi
-		else
-		  clear
-		  echo ""
-		  echo -e ${NM}${WH}"  [${NM}${RD}!${NM}${WH}] Wireless Card${NM}${RD} Not Found${NM}${WH} ."
-		  echo ""
-		fi
-  }
+function stpwl() {
+    INFACENUM=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}' | wc -l`
+    if [[ "${INFACENUM}" -gt 1 ]];
+        then
+            echo -e " ${NM}${PR}╔════════════════════════╗"
+            echo -e " ${NM}${PR}║    ${BD}${YW}SELECT INTERFACE    ${NM}${PR}║"
+            echo -e " ${NM}${PR}╚════════════════════════╝"
+            echo -en "${BD}${WH}"
+            iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' 2>/dev/null
+            echo -e " ${NM}${PR}╚════════════════════════╝"
+            echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
+            read NUM
+            clear
+            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            airmon-ng stop $IMONITOR &>/dev/null
+            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep "${IMONITOR}.*" | sed 's/mon//' | awk '{print $1}'`
+            if [[ -n "$INFACE" ]]
+                then
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode Managed ${NM}${WH}-> ${NM}${BD}STARTED${NM}${WH} ."
+                    echo ""
+                else
+                    clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo ""
+            fi
+    fi
+    if [[ "${INFACENUM}" -eq 1 ]];
+        then
+            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}'`
+            IMANAGED=`echo ${IMONITOR} | sed 's/mon//'`
+            airmon-ng stop $IMONITOR &>/dev/null
+            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep "${IMANAGED}.*" | awk '{print $1}'`
+            if [[ -n "$INFACE" ]]
+                then
+                    # clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode Managed ${NM}${WH}-> ${NM}${BD}STARTED${NM}${WH} ."
+                    echo ""
+                else
+                    # clear
+                    echo ""
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo ""
+            fi
+    fi
+    if [[ "${INFACENUM}" -eq 0 || -z "${INFACENUM}" ]];
+        then
+            clear
+            echo ""
+            echo -e "  ${WH}[${RD}!${WH}] ${GR}Wireless Card ${BD}${RD}Not Found${NM}${WH} ."
+            echo ""
+    fi
+}
 #╚══════════════════════════════════════════════════════════════════════ End ═╝
 
 #╔════════════════════════════════════════════════════════════════════════════╗
