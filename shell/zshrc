@@ -211,7 +211,7 @@ fi
 #║  Connect to WIFI
 #╚═════════════════════════════════════════════════════════════════════════════╝
     function connwifi() {
-        INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | wc -l`
+        INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | wc -l`
         if [[ "${INFACENUM}" -gt 1 ]];
             then
                 echo -e " ${NM}${PR}╔════════════════════════╗"
@@ -223,7 +223,7 @@ fi
                 echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
                 read NUM
                 clear
-                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
                 clear
                 if [[ -n "${IMANAGED}" ]]
                     then
@@ -325,7 +325,7 @@ fi
                 echo -e " ${NM}${PR}╚════════════════════════╝"
                 echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
                 read NUM
-                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
                 if [[ -n "${IMANAGED}" ]]
                     then
                         clear
@@ -396,7 +396,7 @@ fi
 #║  Start airmon-ng
 #╚═════════════════════════════════════════════════════════════════════════════╝
 function stwl() {
-    INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | wc -l`
+    INFACENUM=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | wc -l`
     if [[ "${INFACENUM}" -gt 1 ]];
         then
             echo -e " ${NM}${PR}╔════════════════════════╗"
@@ -408,7 +408,7 @@ function stwl() {
             echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
             read NUM
             clear
-            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
             airmon-ng start $IMANAGED &>/dev/null
             INFACE=`iwconfig 2>/dev/null | grep "${IMANAGED}.*" | grep 'Mode:Monitor' | awk '{print $1}'`
             if [[ -n "$INFACE" ]]
@@ -420,7 +420,7 @@ function stwl() {
                 else
                     clear
                     echo ""
-                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${IMANAGED}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
                     echo ""
             fi
     fi
@@ -438,7 +438,7 @@ function stwl() {
                 else
                     clear
                     echo ""
-                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${IMANAGED}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
                     echo ""
             fi
     fi
@@ -467,9 +467,9 @@ function stpwl() {
             echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
             read NUM
             clear
-            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
             airmon-ng stop $IMONITOR &>/dev/null
-            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep "${IMONITOR}.*" | sed 's/mon//' | awk '{print $1}'`
+            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | grep "${IMONITOR}.*" | sed 's/mon//' | awk '{print $1}'`
             if [[ -n "$INFACE" ]]
                 then
                     clear
@@ -479,7 +479,7 @@ function stpwl() {
                 else
                     clear
                     echo ""
-                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${IMONITOR}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
                     echo ""
             fi
     fi
@@ -488,7 +488,7 @@ function stpwl() {
             IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}'`
             IMANAGED=`echo ${IMONITOR} | sed 's/mon//'`
             airmon-ng stop $IMONITOR &>/dev/null
-            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep "${IMANAGED}.*" | awk '{print $1}'`
+            INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep -v "^-" | grep "${IMANAGED}.*" | awk '{print $1}'`
             if [[ -n "$INFACE" ]]
                 then
                     # clear
@@ -498,7 +498,7 @@ function stpwl() {
                 else
                     # clear
                     echo ""
-                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${INFACE}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
+                    echo -e "  ${BD}${WH}[${RD}!${WH}] ${YW}${IMONITOR}${GR}: mode ${NM}${WH}-> ${NM}${BD}ERROR${NM}${WH} ."
                     echo ""
             fi
     fi
