@@ -298,7 +298,7 @@ FUNC_WPA_function() {
 			echo "" 2> /dev/null
 	fi
 	file_cap=""
-	xterm -T "DUMP ${BSSID}" -geometry 140x30m -e airodump-ng -c $CHANNEL --bssid $BSSID -w ${Temp_GHash}/${BSSID} --output-format csv,pcap $INFACE &> /dev/null &
+	xterm -T "DUMP ${BSSID}" -geometry 140x30 -e airodump-ng -c $CHANNEL --bssid $BSSID -w ${Temp_GHash}/${BSSID} --output-format csv,pcap $INFACE &> /dev/null &
 	Airodump_PID="$!"
 	disown $Airodump_PID
 	if [[ -n "Airodump_PID" ]];
