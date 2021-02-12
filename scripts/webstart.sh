@@ -117,9 +117,9 @@ if [[ "https" == "${TYPEHOST}" ]]
     then
         if [[ -n "${THEREDIRECT}" ]]
             then
-                sed -i "${THEREDIRECT}c\    Redirect \"\/\" \"${TYPEHOST}:\/\/${DOMAINNAME}\"" /etc/apache2/sites-available/000-default.conf
+                sed -i "${THEREDIRECT}c\    Redirect \/ ${TYPEHOST}:\/\/${DOMAINNAME}\/" /etc/apache2/sites-available/000-default.conf
             else
-                sed -i "s/ServerName ${DOMAINNAME}/ServerName ${DOMAINNAME}\n    Redirect \"\/\" \"${TYPEHOST}:\/\/${DOMAINNAME}\"/" /etc/apache2/sites-available/000-default.conf
+                sed -i "s/ServerName ${DOMAINNAME}/ServerName ${DOMAINNAME}\n    Redirect \/ ${TYPEHOST}:\/\/${DOMAINNAME}\//" /etc/apache2/sites-available/000-default.conf
         fi
     else
         if [[ -n "${THEREDIRECT}" ]]
