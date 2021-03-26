@@ -54,6 +54,7 @@ EXAMPLE
     ./hashcrack.sh
     ./hashcrack.sh /home/filehash.hash
 
+
 RECOMMENDATION
 ==============================================
 duf 
