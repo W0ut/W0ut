@@ -390,7 +390,7 @@ fi
                 echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
                 read NUM
                 clear
-                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
                 clear
                 if [[ -n "${IMANAGED}" ]]
                     then
@@ -492,7 +492,7 @@ fi
                 echo -e " ${NM}${PR}╚════════════════════════╝"
                 echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
                 read NUM
-                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+                IMANAGED=`iwconfig 2>/dev/null | grep 'ESSID:.*' | awk '{print $1, $4}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
                 if [[ -n "${IMANAGED}" ]]
                     then
                         clear
@@ -575,7 +575,7 @@ function stwl() {
             echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
             read NUM
             clear
-            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            IMANAGED=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
             airmon-ng start $IMANAGED &>/dev/null
             INFACE=`iwconfig 2>/dev/null | grep "${IMANAGED}.*" | grep 'Mode:Monitor' | awk '{print $1}'`
             if [[ -n "$INFACE" ]]
@@ -634,7 +634,7 @@ function stpwl() {
             echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
             read NUM
             clear
-            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' | grep $NUM | awk '{print $2}'`
+            IMONITOR=`iwconfig 2>&1 | grep 'Mode:Monitor'| awk '{print $1}' | nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
             airmon-ng stop $IMONITOR &>/dev/null
             INFACE=`iwconfig 2>&1 | grep 'Mode:Managed' -B 1 | grep -Ev 'Mode:Managed' | grep "${IMONITOR}.*" | sed 's/mon//' | awk '{print $1}'`
             if [[ -n "$INFACE" ]]

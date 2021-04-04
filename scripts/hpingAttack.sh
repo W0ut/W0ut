@@ -114,7 +114,7 @@
 		echo -en " ${SVC}${WH}[${RD}!${WH}] ${GR}Enter NUM for scan ${NM}${BD}${CY}> ${BD}${RD}"
 		read NUM
 		clear
-		INTERFACE=`ip link show up | grep -E -o '.*>' | awk -F ':' '{print $2}' | nl -s ')' | grep $NUM | awk '{print $2}' 2>/dev/null`
+		INTERFACE=`ip link show up | grep -E -o '.*>' | awk -F ':' '{print $2}' | nl -s ')' | grep "$NUM)" | awk '{print $2}' 2>/dev/null`
 		arp-scan -l -I ${INTERFACE}| grep -wE '[0-9,aAbBcCdDeEfF]{1,2}(\:[0-9,aAbBcCdDeEfF]{1,2}){5}' > ${Temp_GHping}/ipscan.txt
 		VAR1=0
 		traceroute 192.168.99.99 > ${Temp_GHping}/iptest.txt &

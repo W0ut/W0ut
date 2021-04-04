@@ -441,7 +441,7 @@ if [[ "$INFACENUM" -gt 1 ]];
         echo -e " ${NM}${PR}╚════════════════════════╝"
         echo -en " ${SVC}${NM}Enter NUM ${Res}${BD}${CY}> ${BD}${RD}"
         read NUM
-        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' | grep $NUM | awk '{print $2}'`
+        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
         clear
     else
         INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'`

@@ -43,7 +43,7 @@
 		echo -en " ${SVC}${NM}Enter NUM for change ${NM}${BD}${CY}> ${BD}${RD}"
 		read NUM
 		clear
-		INTERFACE=`ip link show up | grep -E -o '.*>' | awk -F ':' '{print $2}' | nl -s ')' | grep $NUM | awk '{print $2}' 2>/dev/null`
+		INTERFACE=`ip link show up | grep -E -o '.*>' | awk -F ':' '{print $2}' | nl -s ')' | grep "$NUM)" | awk '{print $2}' 2>/dev/null`
 		echo -e " ${NM}${RD}╔════════════════════════╗"
 		echo -e " ${NM}${RD}║  ${NM}${YW}INTERFACE FOR CHANGE  ${NM}${RD}║ ${BD}${CY}>> ${NM}${WH}${INTERFACE}"
 		echo -e " ${NM}${RD}╚════════════════════════╝"

