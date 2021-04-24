@@ -315,9 +315,9 @@ fi
 # ══ Add My alias ════════╝  END  ╚═
 
 # ══ Setting for Tor, Privoxy and Proxychains ════════╗ START ╔═
-ChkTor=`dpkg -s tor | grep -w "Status: install ok installed"`
-ChkPrivoxy=`dpkg -s privoxy | grep -w "Status: install ok installed"`
-ChkProxychains=`dpkg -s proxychains | grep -w "Status: install ok installed"`
+ChkTor=`dpkg-query -W -f='${status}' tor 2>/dev/null | grep "install ok installed"`
+ChkPrivoxy=`dpkg-query -W -f='${status}' privoxy 2>/dev/null | grep "install ok installed"`
+ChkProxychains=`dpkg-query -W -f='${status}' proxychains 2>/dev/null | grep "install ok installed"`
 if [[ -n "${ChkTor}" && -n "${ChkPrivoxy}" ]]
     then
         export all_proxy="socks://localhost:9050/"
