@@ -33,17 +33,24 @@
     WORD='Soft'
     MAX="20"
     ThisDir=$(pwd)
+    checkInet=''
 # ══ Variables ════════╝  END  ╚═
 
+# ══ check internet connection ════════╗ START ╔═
+ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && checkInet='1' || checkInet=''
+# ══ check internet connection ════════╝  END  ╚═
 
-apt-get install dos2unix &> /dev/null
-apt-get install xterm &> /dev/null
-apt-get install apt-transport-https &> /dev/null
+if [[ ${checkInet} == '1' ]]
+    then
+        apt-get install dos2unix &> /dev/null
+        apt-get install xterm &> /dev/null
+        apt-get install apt-transport-https &> /dev/null
 
-# ══ Add Sublime text 3 ════════╗ START ╔═
-wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - &> /dev/null
-echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list &> /dev/null
-# ══ Add Sublime text 3 ════════╝  END  ╚═
+        # ══ Add Sublime text 3 ════════╗ START ╔═
+        wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - &> /dev/null
+        echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list &> /dev/null
+        # ══ Add Sublime text 3 ════════╝  END  ╚═
+fi
 
 clear
 dos2unix ${ThisDir}/setting/* &> /dev/null
@@ -195,22 +202,25 @@ FUNC_download_repositories() {
             fi
     fi
 }
-echo -en " ${WH}[${RD}!${WH}] ${GR}Download the recommended repositories? [${WH}N${GR}/y] ${CY}> ${RD}"
-read ADDREP
-clear
-echo -e ""
-if [[ ${ADDREP} == "y" ]]
+if [[ ${checkInet} == '1' ]]
     then
-        WORD='Download status.'
-        MAX="34"
-        FUNC_create_tabl
-        echo -e " ${NM}${GR}[${YW}${max_lf}${BD}${GR}Download status${NM}${YW}${max_rh}${GR}]"
-        while read DWNURL DWNSOFT
-            do
-                FUNC_download_repositories
-        done < ${ThisDir}/setting/list_dwn_soft
+        echo -en " ${WH}[${RD}!${WH}] ${GR}Download the recommended repositories? [${WH}N${GR}/y] ${CY}> ${RD}"
+        read ADDREP
+        clear
+        echo -e ""
+        if [[ ${ADDREP} == "y" ]]
+            then
+                WORD='Download status.'
+                MAX="34"
+                FUNC_create_tabl
+                echo -e " ${NM}${GR}[${YW}${max_lf}${BD}${GR}Download status${NM}${YW}${max_rh}${GR}]"
+                while read DWNURL DWNSOFT
+                    do
+                        FUNC_download_repositories
+                done < ${ThisDir}/setting/list_dwn_soft
+        fi
+        echo -e ""
 fi
-echo -e ""
 echo -e ""
 # ══ download the recommended repositories ════════╝  END  ╚═
 
@@ -244,16 +254,19 @@ echo -e ""
    }
 # ══ Function for checking the installation and installing ════════╝  END  ╚═
 
+if [[ ${checkInet} == '1' ]]
+    then
 # ══ Сhecking the installation ════════╗ START ╔═
-WORD='installation status.'
-MAX="34"
-FUNC_create_tabl
-echo -e " ${NM}${GR}[${YW}${max_lf}${BD}${GR}installation status${NM}${YW}${max_rh}${GR}]"
-while read ChSoft
-    do
-        FUNC_check_install
-done < ${ThisDir}/setting/list_check_soft
+        WORD='installation status.'
+        MAX="34"
+        FUNC_create_tabl
+        echo -e " ${NM}${GR}[${YW}${max_lf}${BD}${GR}installation status${NM}${YW}${max_rh}${GR}]"
+        while read ChSoft
+            do
+                FUNC_check_install
+        done < ${ThisDir}/setting/list_check_soft
 # ══ Check installed programs ════════╝  END  ╚═
+fi
 
 # ══ We fill the files ════════╗ START ╔═
 echo -e "  date, essid, bssid, password, pin" > /${USER}/MyOUTPUT/wifi/WIFI_PASS.txt
