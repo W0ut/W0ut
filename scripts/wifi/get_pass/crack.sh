@@ -405,7 +405,7 @@ FUNC_clean_up()
               NoTest1='Y'
           fi
           TEST2=`aircrack-ng ${CAPFILE} | grep "1 handshake"`
-          if [ -n "$TEST1" -a -n "$TEST2" -o -n "$TEST2" -a "${NoTest1}" == "Y"];
+          if [ -n "$TEST1" -a -n "$TEST2" ] || [ -n "$TEST2" -a "${NoTest1}" == "Y" ];
             then
               # clear
               BSSID=$(aircrack-ng $CAPFILE | grep WPA  | awk -F' '  '{print $2}' 2> /dev/null)
