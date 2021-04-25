@@ -80,6 +80,19 @@
     fi
 #╚══════════════════════════════  End Folder for rezult ═╝
 
+# ══ Function for checking the installation and installing ════════╗ START ╔═
+    FUNC_check_install() {
+      ChInst="N"
+      Chk=`dpkg-query -W -f='${status}' ${ChSoft} 2>/dev/null | grep "install ok installed"`
+      if [[ -n "$Chk" ]]
+          then
+              ChInst="Y"
+          else
+              ChInst="N"
+      fi
+   }
+# ══ Function for checking the installation and installing ════════╝  END  ╚═
+
 #╔══════════════════════════════════════════════╗
 #║  output % cracking
 #╚══════════════════════════════════════════════╝
@@ -374,12 +387,25 @@ FUNC_clean_up()
     {
       FUNC_select_to_crack
       FUNC_select_to_pass
-      makepasswd -count ${GENPASS} > ${Temp_GCrack}/randompasswords.txt &
+      ChSoft='makepasswd'
+      FUNC_check_install
+      if [ ${ChInst} == "Y" ]
+        then
+          makepasswd -count ${GENPASS} > ${Temp_GCrack}/randompasswords.txt &
+      fi
       while read CAPFILE
         do
-          TEST1=`cowpatty -c -r ${CAPFILE} | grep "Collected all necessary data to mount crack against WPA2/PSK passphrase"`
+          ChSoft='cowpatty'
+          NoTest1='N'
+          FUNC_check_install
+          if [ ${ChInst} == "Y" ]
+            then
+              TEST1=`cowpatty -c -r ${CAPFILE} | grep "Collected all necessary data to mount crack against WPA2/PSK passphrase"`
+            else
+              NoTest1='Y'
+          fi
           TEST2=`aircrack-ng ${CAPFILE} | grep "1 handshake"`
-          if [ -n "$TEST1" -a -n "$TEST2" ];
+          if [ -n "$TEST1" -a -n "$TEST2" -o -n "$TEST2" -a "${NoTest1}" == "Y"];
             then
               # clear
               BSSID=$(aircrack-ng $CAPFILE | grep WPA  | awk -F' '  '{print $2}' 2> /dev/null)
@@ -452,7 +478,12 @@ FUNC_set_makepasswd()
 #╚══════════════════════════════════════════════╝
   trap FUNC_Exit SIGINT
   clear
-  FUNC_set_makepasswd
+  ChSoft='makepasswd'
+  FUNC_check_install
+  if [ ${ChInst} == "Y" ]
+    then
+      FUNC_set_makepasswd
+  fi
   clear
   echo -e ""
   if [[ -n ${EnterCap} ]]

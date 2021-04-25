@@ -112,6 +112,10 @@ if [ "$TMP_StPROXY" == "" ];
 fi
 StPROXY=$(cat /tmp/StPROXY)
 
+# ══ check internet connection ════════╗ START ╔═
+ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && checkInet='1' || checkInet=''
+# ══ check internet connection ════════╝  END  ╚═
+
 #╔════════════════════════════════════════════════════════════════════════════╗
 #║    Reset all MAC
 #╚════════════════════════════════════════════════════════════════════════════╝
@@ -188,17 +192,29 @@ StPROXY=$(cat /tmp/StPROXY)
         StPROXY=$(cat /tmp/StPROXY)
     }
 #╚══════════════════════════════════════════════════════════════════════ End ═╝
-if [ "$StPROXY" == "PROXY" ];
+if [[ ${checkInet} == '1' ]]
     then
-        setproxy
+        if [ "$StPROXY" == "PROXY" ];
+            then
+                setproxy
+            else
+                unsetproxy
+        fi
     else
-        unsetproxy
+        echo -en "" > /tmp/StPROXY
+        StPROXY=$(cat /tmp/StPROXY)
 fi
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║    Get internet ip
 #╚═════════════════════════════════════════════════════════════════════════════╝
-    INETIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
-    CITY=$(curl ipinfo.io &> /tmp/ipinftmp && cat /tmp/ipinftmp | grep city | awk -F '"' '{print $4}')
+    if [[ ${checkInet} == '1' ]]
+        then
+            INETIP=$(dig +short myip.opendns.com @resolver1.opendns.com)
+            CITY=$(curl ipinfo.io &> /tmp/ipinftmp && cat /tmp/ipinftmp | grep city | awk -F '"' '{print $4}')
+        else
+            INETIP='null'
+            INETIP='null'
+    fi
 #╚═══════════════════════════════════════════════════════════════════════ End ═╝
 #╔═════════════════════════════════════════════════════════════════════════════╗
 #║    Search all running commands by user

@@ -66,6 +66,19 @@ FUNC_Back_macchanger() {
 }
 #╚══════════════════════════════  End Reset hardware MAC ═╝
 
+# ══ Function for checking the installation and installing ════════╗ START ╔═
+    FUNC_check_install() {
+      ChInst="N"
+      Chk=`dpkg-query -W -f='${status}' ${ChSoft} 2>/dev/null | grep "install ok installed"`
+      if [[ -n "$Chk" ]]
+          then
+              ChInst="Y"
+          else
+              ChInst="N"
+      fi
+   }
+# ══ Function for checking the installation and installing ════════╝  END  ╚═
+
 #╔══════════════════════════════════════════════╗
 #║  Exit and Clear temp files
 #╚══════════════════════════════════════════════╝
@@ -345,7 +358,14 @@ FUNC_WPA_function() {
 									PMKID_found=`cat ${Temp_GHash}/aircrack-ng_rslt.txt | grep 'WPA (0 handshake, with PMKID)' 2> /dev/null`
 									if [[ -n "$Hash_found" || -n "$PMKID_found" ]];
 										then
-											TEST1=`cowpatty -c -r ${Temp_GHash}/${BSSID}-01.cap | grep "Collected all necessary data to mount crack against WPA2/PSK passphrase"`
+											ChSoft='cowpatty'
+											FUNC_check_install
+											if [ ${ChInst} == "Y" ]
+												then
+													TEST1=`cowpatty -c -r ${Temp_GHash}/${BSSID}-01.cap | grep "Collected all necessary data to mount crack against WPA2/PSK passphrase"`
+												else
+													TEST1='N'
+											fi
 											if [[ -n "$TEST1" ]];
 												then
 													if [[ "$ESSID" == "unknown" ]];
@@ -620,7 +640,12 @@ FUNC_set_makepasswd()
 
 trap FUNC_kill_Airo_function SIGINT
 echo ""
-FUNC_set_makepasswd
+ChSoft='makepasswd'
+FUNC_check_install
+if [ ${ChInst} == "Y" ]
+	then
+		FUNC_set_makepasswd
+fi
 INFACE_SET=`iwconfig 2>/dev/null | grep 'Mode:Monitor' | awk '{print $1}'`
 if [[ -z "$INFACE_SET" ]]
 	then
