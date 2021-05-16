@@ -13,16 +13,16 @@ HOW TO INSTALL
 EXAMPLE
 
     ~#getpass
-   ![getpass](https://user-images.githubusercontent.com/17479884/118392314-dc0bba00-b65a-11eb-86ab-5a9b3f7dec75.gif)
+   ![getpass](https://user-images.githubusercontent.com/17479884/118392850-7cfb7480-b65d-11eb-8680-b3987fa0ff5b.gif)
   
     ~#gethash
    ![gethash](https://user-images.githubusercontent.com/17479884/118392241-6a337080-b65a-11eb-9856-7111ee9fb1ba.gif)
    
     ~#getpin
-   ![getpin](https://user-images.githubusercontent.com/17479884/118392333-fba2e280-b65a-11eb-8a9a-40d796d9a59f.gif)
+   ![getpin](https://user-images.githubusercontent.com/17479884/118392839-740aa300-b65d-11eb-94ac-003fc04dc16c.gif)
 
     ~#ikill
-   ![killwifi](https://user-images.githubusercontent.com/17479884/118392407-6eac5900-b65b-11eb-9a40-3c6d2ffedfe5.gif)
+   ![killwifi](https://user-images.githubusercontent.com/17479884/118392834-67864a80-b65d-11eb-8efd-cec69e0dcdea.gif)
 
     ~#sepproxy
    ![proxy](https://user-images.githubusercontent.com/17479884/118392431-871c7380-b65b-11eb-9e1f-f7ed16ec9b21.jpg)
