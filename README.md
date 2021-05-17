@@ -24,7 +24,7 @@ EXAMPLE
     ~#ikill
    ![killwifi](https://user-images.githubusercontent.com/17479884/118392834-67864a80-b65d-11eb-8efd-cec69e0dcdea.gif)
 
-    ~#sepproxy
+    ~#setproxy
    ![proxy](https://user-images.githubusercontent.com/17479884/118392431-871c7380-b65b-11eb-9e1f-f7ed16ec9b21.jpg)
     
     ~#stwl
