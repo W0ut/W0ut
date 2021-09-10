@@ -7,7 +7,6 @@ WHY IS IT ALL?
 HOW TO INSTALL
 
     ~# cd W0ut
-    ~# dos2unix install.sh
     ~# chmod +x install.sh
     ~# ./install.sh
 EXAMPLE

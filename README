@@ -5,7 +5,6 @@ WHY IS IT ALL?
 
 HOW TO INSTALL
     ~# cd Wout
-    ~# dos2unix install.sh
     ~# chmod +x install.sh
     ~# ./install.sh
 
