@@ -50,13 +50,13 @@ if [[ ${checkInet} == '1' ]]
         wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add - &> /dev/null
         echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list &> /dev/null
         # ══ Add Sublime text 3 ════════╝  END  ╚═
+
+        xterm -T "UPDATE ${ChSoft}" -geometry 100x30 -e "apt-get update"    # APT-GET-UPDATE
 fi
 
 clear
-dos2unix ${ThisDir}/setting/* &> /dev/null
 echo ""
 sleep 1.5
-xterm -T "UPDATE ${ChSoft}" -geometry 100x30 -e "apt-get update"    # APT-GET-UPDATE
 
 # ══ Change the BASHRC and ZSHRC to your own ════════╗ START ╔═
 File_BSH=`ls ${ThisDir}/shell | grep -E bashrc`
@@ -283,13 +283,13 @@ cp ${ThisDir}/README /${USER}/MyScript/README &> /dev/null
 # ══ Copy my scripts in new folder ════════╝  END  ╚═
 
 # ══ We solve the issue of encoding ════════╗ START ╔═
-dos2unix /${USER}/MyScript/* &> /dev/null
-dos2unix /${USER}/MyScript/setting/* &> /dev/null
-dos2unix /${USER}/MyScript/wifi/* &> /dev/null
-dos2unix /${USER}/MyScript/wifi/get_hash/* &> /dev/null
-dos2unix /${USER}/MyScript/wifi/get_pin/* &> /dev/null
-dos2unix /${USER}/MyScript/wifi/get_pass/* &> /dev/null
-dos2unix /${USER}/MyScript/wifi/kill_wifi/* &> /dev/null
+# dos2unix /${USER}/MyScript/* &> /dev/null
+# dos2unix /${USER}/MyScript/setting/* &> /dev/null
+# dos2unix /${USER}/MyScript/wifi/* &> /dev/null
+# dos2unix /${USER}/MyScript/wifi/get_hash/* &> /dev/null
+# dos2unix /${USER}/MyScript/wifi/get_pin/* &> /dev/null
+# dos2unix /${USER}/MyScript/wifi/get_pass/* &> /dev/null
+# dos2unix /${USER}/MyScript/wifi/kill_wifi/* &> /dev/null
 # ══ We solve the issue of encoding ════════╝  END  ╚═
 
 # ══ Add rights ════════╗ START ╔═
