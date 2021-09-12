@@ -723,6 +723,49 @@ function stpwl() {
 #╚══════════════════════════════════════════════════════════════════════ End ═╝
 
 #╔════════════════════════════════════════════════════════════════════════════╗
+#║  Add ssh key
+#╚════════════════════════════════════════════════════════════════════════════╝
+	function sshgen() {
+		echo -en " ${WH}[${RD}!${WH}] ${GR}Enter password for ssh key? ${CY}> ${RD}"
+        read KEYSSHPASS
+        if [[ -n "$KEYSSHPASS" ]];
+			then
+				KEYSSHPASS=$KEYSSHPASS
+			else
+				KEYSSHPASS=""
+		fi
+        ssh-keygen -q -t rsa -N "${KEYSSHPASS}" -f ~/.ssh/id_rsa <<<y 2>&1 >/dev/null
+        echo -e " ${BD}${WH}[${RD}!${WH}] ${YW}Key for ${GR} SSH ${NM}${WH}-> ${NM}${BD}GENERATED${NM}${WH}.${NM}"
+        echo ""
+	}
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+
+#╔════════════════════════════════════════════════════════════════════════════╗
+#║  Copy ssh key to host
+#╚════════════════════════════════════════════════════════════════════════════╝
+	function sshadd() {
+		echo -en " ${WH}[${RD}!${WH}] ${GR}Enter the host to copy the key ${BD}${WH}[${RD}root${GR}@${RD}192.168.1.1${WH}] ${CY}> ${RD}"
+        read SSHHOST
+        if [[ -n "$SSHHOST" ]];
+			then
+				SSHHOST=$SSHHOST
+			else
+				SSHHOST="root@192.168.1.1"
+		fi
+        echo -en " ${WH}[${RD}!${WH}] ${GR}Enter port ${BD}${WH}[${RD}22${WH}] ${CY}> ${RD}"
+        read SSHPORT
+        if [[ -n "$SSHPORT" ]];
+			then
+				SSHPORT=$SSHPORT
+			else
+				SSHPORT="22"
+		fi
+		echo -e "${NM}"
+        ssh-copy-id -i ~/.ssh/id_rsa.pub -p ${SSHPORT} ${SSHHOST}
+	}
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+
+#╔════════════════════════════════════════════════════════════════════════════╗
 #║  My alias
 #╚════════════════════════════════════════════════════════════════════════════╝
 alias pscpu='ps auxf | sort -nr -k 3 | grep'
