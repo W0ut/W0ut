@@ -309,6 +309,7 @@ if [[ "${USER}" == "root" ]]
         echo -e "alias idos='cd /${USER}/MyScript/ && ./hpingAttack.sh'" >> ${THESHELL}
         echo -e "alias ichwl='cd /${USER}/MyScript/ && ./chinterface.sh'" >> ${THESHELL}
         echo -e "alias webstart='cd /${USER}/MyScript/ && ./webstart.sh'" >> ${THESHELL}
+        echo -e "alias ipass='cat /${USER}/MyOUTPUT/wifi/WIFI_PASS.txt'" >> ${THESHELL}
         if [[ ${ADDREP} == "y" ]]
             then
                 echo -e "alias cupp='cd /${USER}/soft/cupp/ && python3 cupp.py'" >> ${THESHELL}
