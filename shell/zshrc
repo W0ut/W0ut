@@ -117,6 +117,19 @@ ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && checkIn
 # ══ check internet connection ════════╝  END  ╚═
 
 #╔════════════════════════════════════════════════════════════════════════════╗
+#║    Change all MAC
+#╚════════════════════════════════════════════════════════════════════════════╝
+    function chmac() {
+        ip route show | grep -Eoa "dev.*metric" | awk '{print $2}' | sort -u > /tmp/iface.txt
+        while read MYINTERFACE
+            do
+                ifconfig $MYINTERFACE down 2>/dev/null
+                macchanger -r $MYINTERFACE &>/dev/null
+                ifconfig $MYINTERFACE up 2>/dev/null
+        done < /tmp/iface.txt
+    }
+#╚══════════════════════════════════════════════════════════════════════ End ═╝
+#╔════════════════════════════════════════════════════════════════════════════╗
 #║    Reset all MAC
 #╚════════════════════════════════════════════════════════════════════════════╝
     function resmac() {

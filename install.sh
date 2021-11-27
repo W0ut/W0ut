@@ -313,7 +313,7 @@ if [[ "${USER}" == "root" ]]
         if [[ ${ADDREP} == "y" ]]
             then
                 echo -e "alias cupp='cd /${USER}/soft/cupp/ && python3 cupp.py'" >> ${THESHELL}
-                echo -e "alias socialphish='cd /${USER}/soft/SocialPhish/ && ./socialphish.sh'" >> ${THESHELL}
+                echo -e "alias socphish='cd /${USER}/soft/nexphisher/ && ./nexphisher'" >> ${THESHELL}
                 echo -e "alias duf='cd /${USER}/soft/duf/ && ./duf'" >> ${THESHELL}
         fi
         # ══ Add My alias ════════╝  END  ╚═
