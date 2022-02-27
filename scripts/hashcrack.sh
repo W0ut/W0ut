@@ -43,7 +43,7 @@ FUNC_Exit()
     echo -e "${NM}${WH} [${NM}${RD}!${NM}${WH}] Stoped cracking."
     echo ""
     echo -e "${NM}${WH} [${NM}${RD}!${NM}${WH}] Remove temporary file ."
-    rm -rf ${GHashCrack_FOLDER}
+    rm -rf ${Temp_GHashCrack}
     sleep 1
     echo ""
     exit
