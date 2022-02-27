@@ -43,7 +43,7 @@ FUNC_Exit()
     echo -e "${NM}${WH} [${NM}${RD}!${NM}${WH}] Stoped cracking."
     echo ""
     echo -e "${NM}${WH} [${NM}${RD}!${NM}${WH}] Remove temporary file ."
-    rm -rf ${GHashCrack_FOLDER}
+    rm -rf ${Temp_GHashCrack}
     sleep 1
     echo ""
     exit
@@ -86,7 +86,15 @@ fi
 
 find /${USER}/MyScript/dic -name '*' -printf "%f  %s %p\n" | sort -k2,2n | awk -F ' ' '{print $3}' > ${Temp_GHashCrack}/file_pass.txt
 
-# ══ Find pass and msg ════════╗ START ╔═
+# ══ Insert info ════════╗ START ╔═
+FUNC_insert_info()
+{
+    echo -e " ${NM}${PR}==========================================="
+    echo -e " ${NM} ${BD}${BL}HASH       ${NM}${CY}>>  ${BD}${WH}${STR_HASH}${NM}"
+}
+
+# ══ Insert info ════════╗ START ╔═
+
 FUNC_check_pass()
 {
     CRACKHASH=$(cat ${FOUNDPASSFILE} | grep -i -E "${STR_HASH}.*" | awk -F ':' '{print $2}')
@@ -96,6 +104,7 @@ FUNC_check_pass()
     if [[ -n "${CRACKHASH}" ]]
         then
             FOUNDPASS=${CRACKHASH}
+            echo -e "${STR_HASH}:${FOUNDPASS}:${TYPEHASH}:${IDATE}" >> ${FOUNDPASSFILE}
         else
             if [[ -n "${HISTPASS}" ]]
                 then
@@ -103,16 +112,17 @@ FUNC_check_pass()
                     echo -e "${STR_HASH}:${FOUNDPASS}:${TYPEHASH}:${IDATE}" >> ${FOUNDPASSFILE}
                 else
                     FOUNDPASS="Not FOUND"
-                    TYPEHASH="--"
             fi
     fi
+    echo -e " ${NM} ${BD}${BL}DICT       ${NM}${CY}>>  ${BD}${RD}${Dict}${NM}"
+    echo -e " ${NM} ${BD}${BL}PASS       ${NM}${CY}>>  ${NM}${FOUNDPASS}${NM}"
     if [[ -n "${CRACKHASH}" || -n "${HISTPASS}" ]];
         then
             FOUND="1"
             if [[ -n ${ApiBot} && -n ${Chat_id} ]]
                 then
                 MSGBOT="HASH cracked -> ${STR_HASH} : ${FOUNDPASS} : ${TYPEHASH}"
-                SENDTOBOT=`curl -s "https://api.telegram.org/${ApiBot}/sendMessage?chat_id=${Chat_id}&text=${MSGBOT}" &>/dev/null`
+                SENDTOBOT=`curl -s "https://api.telegram.org/bot${ApiBot}/sendMessage?chat_id=${Chat_id}&text=${MSGBOT}" &>/dev/null`
             fi  
 
     fi
@@ -125,6 +135,7 @@ FUNC_check_hash()
     while read STR_HASH
         do
             FOUND="0"
+            FUNC_insert_info
             echo -e ${STR_HASH} > ${Temp_GHashCrack}/check_str_hash.txt
             echo -e "" >> ${Temp_GHashCrack}/check_str_hash.txt
             FINDMODE=$(hashid -m ${Temp_GHashCrack}/check_str_hash.txt | grep -a -o -E 'Hashcat Mode.*' | sed 's/[^0-9]//g' > ${Temp_GHashCrack}/list_mode.txt)
@@ -133,19 +144,17 @@ FUNC_check_hash()
                     if [[ -n "${ONMODE}" && "${FOUND}" == "0" ]] 
                         then
                             TYPEHASH=$(hashcat -h | sed 's/ //g' | grep -a -o "^${ONMODE}|.*" | awk -F '|' '{print $2}' | head -1)
+                            echo -e " ${NM} ${BD}${BL}TYPE       ${NM}${CY}>>  ${BD}${WH}${TYPEHASH}${NM}"
                             while read Dict
                                 do
                                     if [[ "${FOUND}" == "0" ]]
                                         then
-                                            xterm -T "MODE: ${TYPEHASH} / HASH: ${STR_HASH}" -geometry 100x30 -e "hashcat -a 0 -m ${ONMODE} --status -o ${FOUNDPASSFILE} ${Temp_GHashCrack}/check_str_hash.txt ${Dict}"
+                                            xterm -T "MODE: ${TYPEHASH} / HASH: ${STR_HASH}" -geometry 100x30 -e "hashcat -a 0 -m ${ONMODE} --status --status-timer=15 -o ${FOUNDPASSFILE} ${Temp_GHashCrack}/check_str_hash.txt ${Dict}"
                                             FUNC_check_pass
                                     fi
                             done < ${Temp_GHashCrack}/file_pass.txt
                     fi        
             done < ${Temp_GHashCrack}/list_mode.txt
-            echo -e " ${YW}HASH     - ${RD}${STR_HASH}"
-            echo -e " ${YW}PASSWORD - ${GR}${FOUNDPASS}${NM}"
-            echo -e " ${YW}TYPE     - ${CY}${TYPEHASH}${NM}"
             echo -e " ${NM}${PR}==========================================="
     done < ${HASHFILE}
     echo -e ""
